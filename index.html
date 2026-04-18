@@ -3,12 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A bilingual art & activism exhibition centering women's voices and experiences in public spaces in Gyumri.">
   <title>ազդ | azd</title>
 
   <!-- Միացնում ենք Google Fonts-ից Montserrat տառատեսակը -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Three.js Import Map -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
 
   <style>
     /* Ընդհանուր ոճեր */
@@ -75,6 +86,11 @@
 
     .section {
       margin-bottom: 120px;
+    }
+    
+    .intro-section {
+      border-bottom: 1px solid #eee;
+      padding-bottom: 40px;
     }
 
     .title {
@@ -219,6 +235,79 @@
       text-decoration: none;
     }
 
+    /* 3D Viewer & Modal Styles */
+    .clickable-name {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      transition: color 0.3s;
+    }
+    .clickable-name:hover {
+      color: #666;
+    }
+    .clickable-name::after {
+      content: ' ⟲'; /* 3D rotation symbol indication */
+      font-size: 14px;
+      opacity: 0.5;
+    }
+    
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(5px);
+    }
+    
+    .modal-content {
+      background: #fff;
+      width: 90%;
+      max-width: 800px;
+      height: 80vh;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      cursor: pointer;
+      z-index: 10;
+      color: #333;
+      background: rgba(255,255,255,0.8);
+      border: none;
+      border-radius: 50%;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .close-btn:hover { background: #eee; }
+    
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+      background: #f5f5f5;
+    }
+    
+    #loading-text {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: 600;
+      color: #555;
+      pointer-events: none;
+      text-align: center;
+    }
+
     /* Լեզուների ցուցադրման տրամաբանություն (CSS) */
     body.lang-hy .en { display: none; }
     body.lang-en .hy { display: none; }
@@ -264,225 +353,227 @@
   <div class="container">
     
     <!-- Header -->
-    <div class="topbar">
+    <header class="topbar">
       <div class="logo">
         <span class="hy">ազդ</span>
         <span class="en">azd</span>
       </div>
-      <button class="lang-btn" onclick="toggleLanguage()">
+      <button class="lang-btn" aria-label="Toggle language between Armenian and English" onclick="toggleLanguage()">
         <span class="hy">English</span>
         <span class="en">Հայերեն</span>
       </button>
-    </div>
+    </header>
 
-    <!-- Main Title -->
-    <h1>
-      <span class="hy">ազդ</span>
-      <span class="en">azd</span>
-    </h1>
+    <main>
+      <!-- Main Title -->
+      <h1>
+        <span class="hy">ազդ</span>
+        <span class="en">azd</span>
+      </h1>
 
-    <!-- Ներածական տեքստ (Ընդհանուր նախագծի մասին) -->
-    <section class="section" style="border-bottom: 1px solid #eee; padding-bottom: 40px;">
-      <div class="hy">
-        <p>Գյումրիում, որտեղ հանրային տարածքը ձևավորվել է հիմնականում տղամարդկանց ներկայությամբ և հայացքով, կնոջ ձայնը հաճախ մնում է սահմանափակված՝ լռեցված, մղված դեպի անձնական տարածք։ Այս նախագիծը կենտրոնացնում է հենց կնոջ ներկայությունը՝ որպես գործողություն, որպես միջամտություն, որպես նոր ձևակերպվող իրականություն։</p>
-        <p>Այն վերագրավում է քաղաքային տարածքը կանանց միջոցով՝ դարձնելով նրանց ոչ միայն տեսանելի, այլև ձևավորող ուժ։ Այստեղ կինը այլևս օբյեկտ չէ, այլ սուբյեկտ, որը խոսում է, նշանավորում և վերաձևակերպում է միջավայրը իր փորձով, մարմնով և հիշողությամբ։</p>
-        <p>Հանրային տարածքը դառնում է այդ ներկայության նյութական արտահայտությունը՝ մի դաշտ, որտեղ կնոջ ձայնը դուրս է գալիս փակ տարածքներից և վերածվում է հավաքական, տեսանելի և անշրջելի ներկայության։</p>
-      </div>
-      <div class="en">
-        <p>In Gyumri, where public space has been shaped predominantly by male presence and gaze, women’s voices are often constrained—silenced or confined to the private sphere. This project centers the presence of women as an act, as an intervention, as a redefinition of reality.</p>
-        <p>It reclaims urban space through women, positioning them not only as visible but as active agents of transformation. Here, the woman is no longer an object, but a subject—one who speaks, marks, and reshapes the environment through her experience, body, and memory.</p>
-        <p>Public space becomes the material expression of this presence: a field where women’s voices move beyond containment and emerge as collective, visible, and irreversible.</p>
-      </div>
-    </section>
+      <!-- Ներածական տեքստ (Ընդհանուր նախագծի մասին) -->
+      <section class="section intro-section">
+        <div class="hy">
+          <p>Գյումրիում, որտեղ հանրային տարածքը ձևավորվել է հիմնականում տղամարդկանց ներկայությամբ և հայացքով, կնոջ ձայնը հաճախ մնում է սահմանափակված՝ լռեցված, մղված դեպի անձնական տարածք։ Այս նախագիծը կենտրոնացնում է հենց կնոջ ներկայությունը՝ որպես գործողություն, որպես միջամտություն, որպես նոր ձևակերպվող իրականություն։</p>
+          <p>Այն վերագրավում է քաղաքային տարածքը կանանց միջոցով՝ դարձնելով նրանց ոչ միայն տեսանելի, այլև ձևավորող ուժ։ Այստեղ կինը այլևս օբյեկտ չէ, այլ սուբյեկտ, որը խոսում է, նշանավորում և վերաձևակերպում է միջավայրը իր փորձով, մարմնով և հիշողությամբ։</p>
+          <p>Հանրային տարածքը դառնում է այդ ներկայության նյութական արտահայտությունը՝ մի դաշտ, որտեղ կնոջ ձայնը դուրս է գալիս փակ տարածքներից և վերածվում է հավաքական, տեսանելի և անշրջելի ներկայության։</p>
+        </div>
+        <div class="en">
+          <p>In Gyumri, where public space has been shaped predominantly by male presence and gaze, women’s voices are often constrained—silenced or confined to the private sphere. This project centers the presence of women as an act, as an intervention, as a redefinition of reality.</p>
+          <p>It reclaims urban space through women, positioning them not only as visible but as active agents of transformation. Here, the woman is no longer an object, but a subject—one who speaks, marks, and reshapes the environment through her experience, body, and memory.</p>
+          <p>Public space becomes the material expression of this presence: a field where women’s voices move beyond containment and emerge as collective, visible, and irreversible.</p>
+        </div>
+      </section>
 
-    <!-- Բաժին 1: Սյուզի Գինոսյան -->
-    <section class="section">
-      <div class="hy">
-        <div class="artist-signature">
-          <div class="name">Սյուզի Գինոսյան</div>
-          <div class="line"></div>
-          <div class="artwork">կապ</div>
-          <a href="https://www.google.com/maps/place/Central+Park/@40.7850871,43.8328931,17z/data=!3m1!4b1!4m6!3m5!1s0x4041fc754e297085:0x9e8d0bd8b05d3d5d!8m2!3d40.7850871!4d43.835468!16s%2Fg%2F1td0d_2j?entry=ttu&g_ep=EgoyMDI2MDMyNC4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="location">📍 location</a>
+      <!-- Բաժին 1: Սյուզի Գինոսյան -->
+      <section class="section">
+        <div class="hy">
+          <div class="artist-signature">
+            <div class="name">Սյուզի Գինոսյան</div>
+            <div class="line"></div>
+            <div class="artwork">կապ</div>
+            <a href="https://www.google.com/maps/place/Central+Park/@40.7850871,43.8328931,17z/data=!3m1!4b1!4m6!3m5!1s0x4041fc754e297085:0x9e8d0bd8b05d3d5d!8m2!3d40.7850871!4d43.835468!16s%2Fg%2F1td0d_2j?entry=ttu&g_ep=EgoyMDI2MDMyNC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" class="location">📍 location</a>
+          </div>
+          <p>Անհատը ինքնաբավ չէ․ այն մշտապես ձևավորվում է արտաքին հայացքների և միջամտությունների ներսում։ «Ես»-ը կայուն չէ, այլ դաշտ է, որի վրա միաժամանակ ներգործում են տարբեր կամքեր՝ փորձելով այն ձևավորել իրենց պատկերացմամբ։</p>
+          <p>Թելը այստեղ դառնում է կապի և սահմանի միաժամանակյա նշան․ այն միավորում է, բայց նաև սահմանափակում։ Խնամքի, վերահսկման և պատկանելիության միջև սահմանը խամրում է, իսկ բազմակի ուղղորդումները վերածվում են խճճվածության։</p>
+          <p>Այս խճճվածությունը ստեղծում է ոչ թե շարժում, այլ անշարժություն․ տարբեր «ճիշտ» ուղղություններ չեղարկում են միմյանց։ Ինքնությունը դառնում է դժվար ընթեռնելի, ներքին առանցքը՝ մթագնած։</p>
+          <p>Քանդակը հարցադրում է․ հնարավո՞ր է ազատությունը այնտեղ, որտեղ ինքնությունը կառուցվում է այլոց հայացքի ներքո։ Որտե՞ղ են ավարտվում արտաքին սահմանումները, և որտե՞ղ են սկսվում անձնական սահմանները։</p>
         </div>
-        <p>Անհատը ինքնաբավ չէ․ այն մշտապես ձևավորվում է արտաքին հայացքների և միջամտությունների ներսում։ «Ես»-ը կայուն չէ, այլ դաշտ է, որի վրա միաժամանակ ներգործում են տարբեր կամքեր՝ փորձելով այն ձևավորել իրենց պատկերացմամբ։</p>
-        <p>Թելը այստեղ դառնում է կապի և սահմանի միաժամանակյա նշան․ այն միավորում է, բայց նաև սահմանափակում։ Խնամքի, վերահսկման և պատկանելիության միջև սահմանը խամրում է, իսկ բազմակի ուղղորդումները վերածվում են խճճվածության։</p>
-        <p>Այս խճճվածությունը ստեղծում է ոչ թե շարժում, այլ անշարժություն․ տարբեր «ճիշտ» ուղղություններ չեղարկում են միմյանց։ Ինքնությունը դառնում է դժվար ընթեռնելի, ներքին առանցքը՝ մթագնած։</p>
-        <p>Քանդակը հարցադրում է․ հնարավո՞ր է ազատությունը այնտեղ, որտեղ ինքնությունը կառուցվում է այլոց հայացքի ներքո։ Որտե՞ղ են ավարտվում արտաքին սահմանումները, և որտե՞ղ են սկսվում անձնական սահմանները։</p>
-      </div>
-      <div class="en">
-        <div class="artist-signature">
-          <div class="name">Suzy Ginosyan</div>
-          <div class="line"></div>
-          <div class="artwork">bond</div>
-          <a href="https://www.google.com/maps/place/Central+Park/@40.7850871,43.8328931,17z/data=!3m1!4b1!4m6!3m5!1s0x4041fc754e297085:0x9e8d0bd8b05d3d5d!8m2!3d40.7850871!4d43.835468!16s%2Fg%2F1td0d_2j?entry=ttu&g_ep=EgoyMDI2MDMyNC4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="location">📍 location</a>
+        <div class="en">
+          <div class="artist-signature">
+            <div class="name">Suzy Ginosyan</div>
+            <div class="line"></div>
+            <div class="artwork">bond</div>
+            <a href="https://www.google.com/maps/place/Central+Park/@40.7850871,43.8328931,17z/data=!3m1!4b1!4m6!3m5!1s0x4041fc754e297085:0x9e8d0bd8b05d3d5d!8m2!3d40.7850871!4d43.835468!16s%2Fg%2F1td0d_2j?entry=ttu&g_ep=EgoyMDI2MDMyNC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" class="location">📍 location</a>
+          </div>
+          <p>The individual is not self-contained, but continuously shaped through external gazes and interventions. The “self” emerges not as a stable entity, but as a field where multiple wills act simultaneously, attempting to define it.</p>
+          <p>The thread functions as both connection and boundary—binding while constraining. It reveals the blurred threshold between care, control, and belonging, as multiple directions accumulate into entanglement.</p>
+          <p>This entanglement produces not movement, but stillness: competing “correct” trajectories cancel one another out. Identity becomes difficult to read, its inner axis obscured.</p>
+          <p>The work questions whether freedom is possible where identity is formed under the gaze of others, and where external definitions end as personal boundaries begin.</p>
         </div>
-        <p>The individual is not self-contained, but continuously shaped through external gazes and interventions. The “self” emerges not as a stable entity, but as a field where multiple wills act simultaneously, attempting to define it.</p>
-        <p>The thread functions as both connection and boundary—binding while constraining. It reveals the blurred threshold between care, control, and belonging, as multiple directions accumulate into entanglement.</p>
-        <p>This entanglement produces not movement, but stillness: competing “correct” trajectories cancel one another out. Identity becomes difficult to read, its inner axis obscured.</p>
-        <p>The work questions whether freedom is possible where identity is formed under the gaze of others, and where external definitions end as personal boundaries begin.</p>
-      </div>
-    </section>
+      </section>
 
-    <!-- Բաժին 2: Անի Խաչատրյան -->
-    <section class="section">
-      <img src="placeholder.jpg" alt="" class="artwork-img" onerror="this.style.display='none'">
-      <div class="hy">
-        <div class="artist-signature">
-          <div class="name">Անի Խաչատրյան</div>
-          <div class="line"></div>
-          <div class="artwork">մարմին</div>
+      <!-- Բաժին 2: Անի Խաչատրյան -->
+      <section class="section">
+        <img src="placeholder.jpg" alt="Abstract artwork representing the human body and equality" class="artwork-img" onerror="this.style.display='none'">
+        <div class="hy">
+          <div class="artist-signature">
+            <div class="name">Անի Խաչատրյան</div>
+            <div class="line"></div>
+            <div class="artwork">մարմին</div>
+          </div>
+          <p>Մարդը այս աշխարհում ամենաեզակի և արարչական երևույթներից մեկն է։ Մարդկային ոգին ու բնազդը այնպիսի խորություն ունեն, որ ոչինչ չի կարող ամբողջությամբ չափել կամ սահմանել դրանք։ Թե տղամարդը, թե կինը բնության ստեղծագործություններ են՝ երբեմն հանգիստ, երբեմն փոթորկոտ, երբեմն էլ անսահման ուժով լի։ Հենց այստեղից էլ ծնվում է հավասարության գաղափարը՝ այն միտքը, որ բոլոր մարդիկ ունեն նույն արժեքը, նույն իրավունքը՝ անկախ սեռից կամ ընտրությունից։</p>
+          <p>Մարդու մարմինը նման է անծայրածիր օվկիանոսի՝ միաժամանակ խաղաղ ու ալեկոծ, խոր ու անհասկանալի։</p>
+          <p>Եվ ֆեմինիստական գաղափարը չի ոգևորում կանանց, կոտրելով տղամարդու կերպարը։ Այլ հավասար նորմերի է վերածում մարդկային հարաբերությունները։</p>
         </div>
-        <p>Մարդը այս աշխարհում ամենաեզակի և արարչական երևույթներից մեկն է։ Մարդկային ոգին ու բնազդը այնպիսի խորություն ունեն, որ ոչինչ չի կարող ամբողջությամբ չափել կամ սահմանել դրանք։ Թե տղամարդը, թե կինը բնության ստեղծագործություններ են՝ երբեմն հանգիստ, երբեմն փոթորկոտ, երբեմն էլ անսահման ուժով լի։ Հենց այստեղից էլ ծնվում է հավասարության գաղափարը՝ այն միտքը, որ բոլոր մարդիկ ունեն նույն արժեքը, նույն իրավունքը՝ անկախ սեռից կամ ընտրությունից։</p>
-        <p>Մարդու մարմինը նման է անծայրածիր օվկիանոսի՝ միաժամանակ խաղաղ ու ալեկոծ, խոր ու անհասկանալի։</p>
-        <p>Եվ ֆեմինիստական գաղափարը չի ոգևորում կանանց, կոտրելով տղամարդու կերպարը։ Այլ հավասար նորմերի է վերածում մարդկային հարաբերությունները։</p>
-      </div>
-      <div class="en">
-        <div class="artist-signature">
-          <div class="name">Ani Khachatryan</div>
-          <div class="line"></div>
-          <div class="artwork">Body</div>
+        <div class="en">
+          <div class="artist-signature">
+            <div class="name">Ani Khachatryan</div>
+            <div class="line"></div>
+            <div class="artwork">Body</div>
+          </div>
+          <p>Humans are among the most unique and creative phenomena in this world. The human spirit and instinct possess such depth that nothing can fully measure or define them. Both men and women are creations of nature—sometimes calm, sometimes stormy, and sometimes filled with infinite strength. This is where the idea of equality is born: the thought that all people have the same value, the same rights, regardless of gender or choices.</p>
+          <p>The human body is like a boundless ocean—simultaneously peaceful and turbulent, deep and incomprehensible.</p>
+          <p>And the feminist idea does not empower women by breaking down the image of the man. Rather, it transforms human relationships into equal norms.</p>
         </div>
-        <p>Humans are among the most unique and creative phenomena in this world. The human spirit and instinct possess such depth that nothing can fully measure or define them. Both men and women are creations of nature—sometimes calm, sometimes stormy, and sometimes filled with infinite strength. This is where the idea of equality is born: the thought that all people have the same value, the same rights, regardless of gender or choices.</p>
-        <p>The human body is like a boundless ocean—simultaneously peaceful and turbulent, deep and incomprehensible.</p>
-        <p>And the feminist idea does not empower women by breaking down the image of the man. Rather, it transforms human relationships into equal norms.</p>
-      </div>
-    </section>
+      </section>
 
-    <!-- Բաժին 3: Նուշ Պետրոսյան -->
-    <section class="section">
-      <div class="hy">
-        <div class="artist-signature">
-          <div class="name">Նուշ Պետրոսյան</div>
-          <div class="line"></div>
-          <div class="artwork">Ձայն</div>
+      <!-- Բաժին 3: Նուշ Պետրոսյան -->
+      <section class="section">
+        <div class="hy">
+          <div class="artist-signature">
+            <div class="name">Նուշ Պետրոսյան</div>
+            <div class="line"></div>
+            <div class="artwork">Ձայն</div>
+          </div>
+          <p>Նույնիսկ եթե ձայն ունես, կարո՞ղ ես իսկապես խոսել։</p>
+          <p>Ոչ ոք ֆիզիկապես քեզ չի կանգնեցնում, ոչ ոք չի լռեցնում, բայց քննադատվելու վախը բառերը կողպում է կոկորդում։ Սա մի թեմա է, որը ո՛չ կարող ես կուլ տալ, ո՛չ էլ արտաբերել։ Բայց միայն այդ վախի բացակայության դեպքում խոսելը կարող է ավելի անվտանգ թվալ, քան լռությունը։</p>
         </div>
-        <p>Նույնիսկ եթե ձայն ունես, կարո՞ղ ես իսկապես խոսել։</p>
-        <p>Ոչ ոք ֆիզիկապես քեզ չի կանգնեցնում, ոչ ոք չի լռեցնում, բայց քննադատվելու վախը բառերը կողպում է կոկորդում։ Սա մի թեմա է, որը ո՛չ կարող ես կուլ տալ, ո՛չ էլ արտաբերել։ Բայց միայն այդ վախի բացակայության դեպքում խոսելը կարող է ավելի անվտանգ թվալ, քան լռությունը։</p>
-      </div>
-      <div class="en">
-        <div class="artist-signature">
-          <div class="name">Nush Petrosyan</div>
-          <div class="line"></div>
-          <div class="artwork">Voice</div>
+        <div class="en">
+          <div class="artist-signature">
+            <div class="name">Nush Petrosyan</div>
+            <div class="line"></div>
+            <div class="artwork">Voice</div>
+          </div>
+          <p>Even if you have a voice, can you really speak?</p>
+          <p>Sure, you can talk. Nobody physically stops you, but the fear of judgement keeps the words locked in your throat. It’s a topic which you can’t swallow but also can’t spit it out. Only without that fear can speaking feel safer than silence.</p>
         </div>
-        <p>Even if you have a voice, can you really speak?</p>
-        <p>Sure, you can talk. Nobody physically stops you, but the fear of judgement keeps the words locked in your throat. It’s a topic which you can’t swallow but also can’t spit it out. Only without that fear can speaking feel safer than silence.</p>
-      </div>
-    </section>
+      </section>
 
-    <!-- Բաժին 4: Գրետա Գրիգորյան -->
-    <section class="section">
-      <div class="hy">
-        <div class="artist-signature">
-          <div class="name">Գրետա Գրիգորյան</div>
-          <div class="line"></div>
-          <div class="artwork">Անահիտ</div>
+      <!-- Բաժին 4: Գրետա Գրիգորյան -->
+      <section class="section">
+        <div class="hy">
+          <div class="artist-signature">
+            <div class="name">Գրետա Գրիգորյան</div>
+            <div class="line"></div>
+            <div class="artwork">Անահիտ</div>
+          </div>
+          <p>Այս նախագիծը ուսումնասիրում է տարբեր լինելու հուզական ծանրությունը փոքր քաղաքում, որտեղ անհատականությունը հաճախ դառնում է մեկուսացման պատճառ, ոչ թե ազատության։</p>
+          <p>Կերպարը ներկայացնում է մի մարդու, ով հրաժարվում է կորցնել իր ինքնությունը՝ նույնիսկ մշտական հասարակական ճնշման պայմաններում։</p>
+          <p>Այնպիսի վայրում, որտեղ բոլորը ճանաչում են միմյանց, առանձնանալը քեզ դարձնում է օտար, գրեթե՝ այլմոլորակային։ Անծանոթը դառնում է անհարմար մյուսների համար, և այդ անհարմարությունը վերածվում է շշուկների, դատողությունների և քո մասին տարածվող բամբասանքների։</p>
+          <p>Այս բոլոր խոսքերն ու կարծիքները սկսում են ծանրանալ, կարծես մի բան սեղմում է կոկորդդ։ Դառնում է դժվար ապրել ազատ ու պարզապես լինել այն, ինչ դու ես։</p>
+          <p>Նախագիծը ցույց է տալիս ընդունված լինելու և յուրահատուկ մնալու միջև պայքարը։ Այն ընդգծում է, թե որքան դժվար, բայց միևնույն ժամանակ կարևոր է մնալ ինքդ քեզ՝ անկախ նրանից, թե ինչ են ասում մյուսները։</p>
         </div>
-        <p>Այս նախագիծը ուսումնասիրում է տարբեր լինելու հուզական ծանրությունը փոքր քաղաքում, որտեղ անհատականությունը հաճախ դառնում է մեկուսացման պատճառ, ոչ թե ազատության։</p>
-        <p>Կերպարը ներկայացնում է մի մարդու, ով հրաժարվում է կորցնել իր ինքնությունը՝ նույնիսկ մշտական հասարակական ճնշման պայմաններում։</p>
-        <p>Այնպիսի վայրում, որտեղ բոլորը ճանաչում են միմյանց, առանձնանալը քեզ դարձնում է օտար, գրեթե՝ այլմոլորակային։ Անծանոթը դառնում է անհարմար մյուսների համար, և այդ անհարմարությունը վերածվում է շշուկների, դատողությունների և քո մասին տարածվող բամբասանքների։</p>
-        <p>Այս բոլոր խոսքերն ու կարծիքները սկսում են ծանրանալ, կարծես մի բան սեղմում է կոկորդդ։ Դառնում է դժվար ապրել ազատ ու պարզապես լինել այն, ինչ դու ես։</p>
-        <p>Նախագիծը ցույց է տալիս ընդունված լինելու և յուրահատուկ մնալու միջև պայքարը։ Այն ընդգծում է, թե որքան դժվար, բայց միևնույն ժամանակ կարևոր է մնալ ինքդ քեզ՝ անկախ նրանից, թե ինչ են ասում մյուսները։</p>
-      </div>
-      <div class="en">
-        <div class="artist-signature">
-          <div class="name">Greta Grigoryan</div>
-          <div class="line"></div>
-          <div class="artwork">Anahit</div>
+        <div class="en">
+          <div class="artist-signature">
+            <div class="name">Greta Grigoryan</div>
+            <div class="line"></div>
+            <div class="artwork">Anahit</div>
+          </div>
+          <p>This project explores the emotional weight of being different in a small city, where individuality often becomes a source of isolation rather than freedom. The character represents a person who refuses to lose their identity, even under constant social pressure.</p>
+          <p>In a place where everyone knows each other, standing out makes you feel like an outsider, almost like an alien. The unfamiliar becomes uncomfortable for others, and this discomfort turns into whispers, judgment, and gossip behind your back.</p>
+          <p>All these words and opinions start to feel heavy, like something tightening around your neck. It becomes difficult to live freely and just be yourself. The project shows the struggle between being accepted and staying unique. It highlights how difficult, but important it is to remain yourself, no matter what others say.</p>
         </div>
-        <p>This project explores the emotional weight of being different in a small city, where individuality often becomes a source of isolation rather than freedom. The character represents a person who refuses to lose their identity, even under constant social pressure.</p>
-        <p>In a place where everyone knows each other, standing out makes you feel like an outsider, almost like an alien. The unfamiliar becomes uncomfortable for others, and this discomfort turns into whispers, judgment, and gossip behind your back.</p>
-        <p>All these words and opinions start to feel heavy, like something tightening around your neck. It becomes difficult to live freely and just be yourself. The project shows the struggle between being accepted and staying unique. It highlights how difficult, but important it is to remain yourself, no matter what others say.</p>
-      </div>
-    </section>
+      </section>
 
-    <!-- Բաժին 5: Շահանե Հարությունյան -->
-    <section class="section">
-      <img src="IMG_7889.jpg" alt="Միսֆիթ / Misfit" class="artwork-img" onerror="this.style.display='none'">
-      <div class="hy">
-        <div class="artist-signature">
-          <div class="name">Շահանե Հարությունյան</div>
-          <div class="line"></div>
-          <div class="artwork">միսֆիթ</div>
+      <!-- Բաժին 5: Շահանե Հարությունյան -->
+      <section class="section">
+        <img src="IMG_7889.jpg" alt="Misfit artwork portraying a heart enclosed in a cage, symbolizing societal constraints" class="artwork-img" onerror="this.style.display='none'">
+        <div class="hy">
+          <div class="artist-signature">
+            <div class="name">Շահանե Հարությունյան</div>
+            <div class="line"></div>
+            <div class="artwork">միսֆիթ</div>
+          </div>
+          <p>Այս աշխատանքը արտացոլում է, թե ինչպես են սոցիալական սպասումները աննկատ ձևավորում և սահմանափակում մարդկանց, հատկապես կանանց՝ սահմանափակելով նրանց ներքին աշխարհի արտահայտումը։</p>
+          <p>Սիրտը խորհրդանշում է ինքնությունը, հույզերն ու խոցելիությունը, իսկ վանդակը՝ հասարակության, ավանդույթների և դատողության մշտական ճնշումը։</p>
         </div>
-        <p>Այս աշխատանքը արտացոլում է, թե ինչպես են սոցիալական սպասումները աննկատ ձևավորում և սահմանափակում մարդկանց, հատկապես կանանց՝ սահմանափակելով նրանց ներքին աշխարհի արտահայտումը։</p>
-        <p>Սիրտը խորհրդանշում է ինքնությունը, հույզերն ու խոցելիությունը, իսկ վանդակը՝ հասարակության, ավանդույթների և դատողության մշտական ճնշումը։</p>
-      </div>
-      <div class="en">
-        <div class="artist-signature">
-          <div class="name">Shahane Harutyunyan</div>
-          <div class="line"></div>
-          <div class="artwork">Misfit</div>
+        <div class="en">
+          <div class="artist-signature">
+            <div class="name">Shahane Harutyunyan</div>
+            <div class="line"></div>
+            <div class="artwork">Misfit</div>
+          </div>
+          <p>This piece reflects the way social expectations quietly shape and confine people, especially women, limiting the expression of their inner selves.</p>
+          <p>The heart symbolizes identity, emotion, and vulnerability, while the cage represents the constant pressure of society, tradition, and judgment.</p>
         </div>
-        <p>This piece reflects the way social expectations quietly shape and confine people, especially women, limiting the expression of their inner selves.</p>
-        <p>The heart symbolizes identity, emotion, and vulnerability, while the cage represents the constant pressure of society, tradition, and judgment.</p>
-      </div>
-    </section>
+      </section>
 
-    <!-- Բաժին 6: Ջենի Գևորգյան -->
-    <section class="section">
-      <div class="hy">
-        <div class="artist-signature">
-          <div class="name">Ջենի Գևորգյան</div>
-          <div class="line"></div>
-          <div class="artwork">Պայքարից հանգստանալու թույլտվություն</div>
+      <!-- Բաժին 6: Ջենի Գևորգյան -->
+      <section class="section">
+        <div class="hy">
+          <div class="artist-signature">
+            <div class="name">Ջենի Գևորգյան</div>
+            <div class="line"></div>
+            <div class="artwork">Պայքարից հանգստանալու թույլտվություն</div>
+          </div>
+          <p>Գուցե դանակի տեղը իրականությունն է, որ ստիպում է փակել աչքերդ։</p>
         </div>
-        <p>Գուցե դանակի տեղը իրականությունն է, որ ստիպում է փակել աչքերդ։</p>
-      </div>
-      <div class="en">
-        <div class="artist-signature">
-          <div class="name">Jenny Gevorgyan</div>
-          <div class="line"></div>
-          <div class="artwork">Permission to rest from the struggle</div>
+        <div class="en">
+          <div class="artist-signature">
+            <div class="name">Jenny Gevorgyan</div>
+            <div class="line"></div>
+            <div class="artwork">Permission to rest from the struggle</div>
+          </div>
+          <p>Maybe instead of a knife, reality is what forces you to close your eyes.</p>
         </div>
-        <p>Maybe instead of a knife, reality is what forces you to close your eyes.</p>
-      </div>
-    </section>
+      </section>
 
-    <!-- Բաժին 7: Եվա Աբգարյան -->
-    <section class="section">
-      <div class="hy">
-        <div class="artist-signature">
-          <div class="name">Եվա Աբգարյան</div>
-          <div class="line"></div>
-          <div class="artwork">Faceless</div>
+      <!-- Բաժին 7: Եվա Աբգարյան -->
+      <section class="section">
+        <div class="hy">
+          <div class="artist-signature">
+            <div class="name">Եվա Աբգարյան</div>
+            <div class="line"></div>
+            <div class="artwork">Faceless</div>
+          </div>
+          <p>Արվեստի գործն ինքնին խոսում է իր մասին. այն պատկերում է ինձ նման մի աղջկա, որը ձեռքին երկու դիմակ է պահում. մեկը ժպտում է, մյուսը՝ ավելի մեծ ժպտում, կարծես սրանք միակ դեմքերն են, որոնցից նրան թույլատրվում է ընտրել: Դրանց տակ նրա իրական դեմքն է՝ արցունքոտ և անխորտակ աչքեր, կարծես ներսում ինչ-որ բան խլվել է: Ես միշտ զգացել եմ ճնշում՝ ավելի հանգիստ, մեղմ, աշխարհին ավելի հաճելի լինելու համար, ուստի այս ընտրությունը դառնում է գոյության միջոց՝ այն ցավոտ է թվում, բայց պահպանում է ներդաշնակություն՝ ինձ հեռացնելով այն զգացողությունից, թե ինչը կարող է սխալ ընթանալ:</p>
         </div>
-        <p>Արվեստի գործն ինքնին խոսում է իր մասին. այն պատկերում է ինձ նման մի աղջկա, որը ձեռքին երկու դիմակ է պահում. մեկը ժպտում է, մյուսը՝ ավելի մեծ ժպտում, կարծես սրանք միակ դեմքերն են, որոնցից նրան թույլատրվում է ընտրել: Դրանց տակ նրա իրական դեմքն է՝ արցունքոտ և անխորտակ աչքեր, կարծես ներսում ինչ-որ բան խլվել է: Ես միշտ զգացել եմ ճնշում՝ ավելի հանգիստ, մեղմ, աշխարհին ավելի հաճելի լինելու համար, ուստի այս ընտրությունը դառնում է գոյության միջոց՝ այն ցավոտ է թվում, բայց պահպանում է ներդաշնակություն՝ ինձ հեռացնելով այն զգացողությունից, թե ինչը կարող է սխալ ընթանալ:</p>
-      </div>
-      <div class="en">
-        <div class="artist-signature">
-          <div class="name">Yeva Abgaryan</div>
-          <div class="line"></div>
-          <div class="artwork">Faceless</div>
+        <div class="en">
+          <div class="artist-signature">
+            <div class="name">Yeva Abgaryan</div>
+            <div class="line"></div>
+            <div class="artwork">Faceless</div>
+          </div>
+          <p>The artwork speaks for itself-it shows a girl, looking like me, holding two masks: one smiling, another smiling even bigger, as if these are the only faces she is allowed to choose from. Beneath them, her real face-eyes in tears and depthless, as if something inside has been taken away. I’ve always felt a pressure to be calmer, softer, more likable to the world, so this choice becomes a way to exist-it feels painful, but keeps a fragile harmony by distancing me from the feeling of what might go wrong.</p>
         </div>
-        <p>The artwork speaks for itself-it shows a girl, looking like me, holding two masks: one smiling, another smiling even bigger, as if these are the only faces she is allowed to choose from. Beneath them, her real face-eyes in tears and depthless, as if something inside has been taken away. I’ve always felt a pressure to be calmer, softer, more likable to the world, so this choice becomes a way to exist-it feels painful, but keeps a fragile harmony by distancing me from the feeling of what might go wrong.</p>
-      </div>
-    </section>
+      </section>
 
-    <!-- Բաժին 8: Էմիլյա Նիկողոսյան -->
-    <section class="section">
-      <div class="hy">
-        <div class="artist-signature">
-          <div class="name">Էմիլյա Նիկողոսյան</div>
-          <div class="line"></div>
+      <!-- Բաժին 8: Էմիլյա Նիկողոսյան -->
+      <section class="section">
+        <div class="hy">
+          <div class="artist-signature">
+            <div class="name">Էմիլյա Նիկողոսյան</div>
+            <div class="line"></div>
+          </div>
+          <p>Մեր աշխարհի ներսում կան բազմաթիվ այլ աշխարհներ։</p>
+          <p>Հնարավոր է՝ այլևս ասելու ոչինչ չկա—</p>
+          <p>բացի նրանից, որ երբեմն դրանք անդրադարձվում են մեզ։</p>
         </div>
-        <p>Մեր աշխարհի ներսում կան բազմաթիվ այլ աշխարհներ։</p>
-        <p>Հնարավոր է՝ այլևս ասելու ոչինչ չկա—</p>
-        <p>բացի նրանից, որ երբեմն դրանք անդրադարձվում են մեզ։</p>
-      </div>
-      <div class="en">
-        <div class="artist-signature">
-          <div class="name">Emilya Nikoghosyan</div>
-          <div class="line"></div>
+        <div class="en">
+          <div class="artist-signature">
+            <div class="name">Emilya Nikoghosyan</div>
+            <div class="line"></div>
+          </div>
+          <p>Inside our world, there are many other worlds.</p>
+          <p>Maybe nothing more needs to be said—</p>
+          <p>except that sometimes, they reflect back.</p>
         </div>
-        <p>Inside our world, there are many other worlds.</p>
-        <p>Maybe nothing more needs to be said—</p>
-        <p>except that sometimes, they reflect back.</p>
-      </div>
-    </section>
+      </section>
+    </main>
 
     <!-- Աջակցության և Ռեսուրսների Բաժին -->
-    <section class="support-section">
+    <footer class="support-section">
       
       <!-- Հայերեն տարբերակ -->
       <div class="hy">
@@ -510,11 +601,11 @@
           <div class="support-col">
             <h3>Դիմեք</h3>
             <div class="support-table">
-              <div class="full-width"><a href="https://saccarmenia.org/en_us/%D5%B4%D5%A5%D6%80-%D5%B4%D5%A1%D5%BD%D5%AB%D5%B6/" target="_blank">Սեռական բռնության ճգնաժամային կենտրոն</a></div>
-              <div class="full-width"><a href="https://womenfundarmenia.org/" target="_blank">Կանանց Հիմնադրամ Հայաստան</a></div>
-              <div class="full-width"><a href="https://womensrightshouse.org/about-us/" target="_blank">Կանանց իրավունքների տուն</a></div>
-              <div class="full-width"><a href="https://womenofarmenia.org/" target="_blank">Կանանց ռեսուրսային կենտրոն</a></div>
-              <div class="fw-bold"><a href="https://safeyou.space/en" target="_blank">Safe YOU</a></div>
+              <div class="full-width"><a href="https://saccarmenia.org/en_us/%D5%B4%D5%A5%D6%80-%D5%B4%D5%A1%D5%BD%D5%AB%D5%B6/" target="_blank" rel="noopener noreferrer">Սեռական բռնության ճգնաժամային կենտրոն</a></div>
+              <div class="full-width"><a href="https://womenfundarmenia.org/" target="_blank" rel="noopener noreferrer">Կանանց Հիմնադրամ Հայաստան</a></div>
+              <div class="full-width"><a href="https://womensrightshouse.org/about-us/" target="_blank" rel="noopener noreferrer">Կանանց իրավունքների տուն</a></div>
+              <div class="full-width"><a href="https://womenofarmenia.org/" target="_blank" rel="noopener noreferrer">Կանանց ռեսուրսային կենտրոն</a></div>
+              <div class="fw-bold"><a href="https://safeyou.space/en" target="_blank" rel="noopener noreferrer">Safe YOU</a></div>
               <div>բջջային աջակցության ցանց</div>
             </div>
           </div>
@@ -547,18 +638,18 @@
           <div class="support-col">
             <h3>Reach</h3>
             <div class="support-table">
-              <div class="full-width"><a href="https://saccarmenia.org/en_us/" target="_blank">Sexual Assault Crisis Center</a></div>
-              <div class="full-width"><a href="https://womenfundarmenia.org/" target="_blank">Women's Fund Armenia</a></div>
-              <div class="full-width"><a href="https://womensrightshouse.org/about-us/" target="_blank">Women's Rights House</a></div>
-              <div class="full-width"><a href="https://womenofarmenia.org/" target="_blank">Women's Resource Center</a></div>
-              <div class="fw-bold"><a href="https://safeyou.space/en" target="_blank">Safe YOU</a></div>
+              <div class="full-width"><a href="https://saccarmenia.org/en_us/" target="_blank" rel="noopener noreferrer">Sexual Assault Crisis Center</a></div>
+              <div class="full-width"><a href="https://womenfundarmenia.org/" target="_blank" rel="noopener noreferrer">Women's Fund Armenia</a></div>
+              <div class="full-width"><a href="https://womensrightshouse.org/about-us/" target="_blank" rel="noopener noreferrer">Women's Rights House</a></div>
+              <div class="full-width"><a href="https://womenofarmenia.org/" target="_blank" rel="noopener noreferrer">Women's Resource Center</a></div>
+              <div class="fw-bold"><a href="https://safeyou.space/en" target="_blank" rel="noopener noreferrer">Safe YOU</a></div>
               <div>mobile support network</div>
             </div>
           </div>
         </div>
       </div>
 
-    </section>
+    </footer>
 
   </div>
 
@@ -578,5 +669,213 @@
     }
   </script>
 
+  <!-- 3D Modal Structure -->
+  <div id="stl-modal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="close-btn" id="close-modal" aria-label="Close modal">&times;</button>
+      <div id="loading-text">Loading 3D Model...</div>
+      <div id="canvas-container"></div>
+    </div>
+  </div>
+
+  <!-- 3D Viewer Logic (Three.js) -->
+  <script type="module">
+    import * as THREE from 'three';
+    import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // Data Structure mapping artists to their respective STL files.
+    // FOR PREVIEW ENVIRONMENT: We are using a temporary absolute public URL 
+    // to a sample STL file. This avoids the "blob:" URL errors caused by the preview sandbox.
+    // 
+    // TODO: When you deploy to your own server, replace this 'sampleStl' 
+    // with your actual relative paths (e.g., "models/suzy_bond.stl").
+    const sampleStl = "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/stl/ascii/slotted_disk.stl";
+
+    const artistModels = {
+      "Սյուզի Գինոսյան": sampleStl, // Replace with "models/suzy_bond.stl"
+      "Suzy Ginosyan": sampleStl, 
+      "Անի Խաչատրյան": sampleStl, // Replace with "models/ani_body.stl"
+      "Ani Khachatryan": sampleStl,
+      "Նուշ Պետրոսյան": sampleStl, // Replace with "models/nush_voice.stl"
+      "Nush Petrosyan": sampleStl,
+      "Գրետա Գրիգորյան": sampleStl, // Replace with "models/greta_anahit.stl"
+      "Greta Grigoryan": sampleStl,
+      "Շահանե Հարությունյան": sampleStl, // Replace with "models/shahane_misfit.stl"
+      "Shahane Harutyunyan": sampleStl,
+      "Ջենի Գևորգյան": sampleStl, // Replace with "models/jenny_permission.stl"
+      "Jenny Gevorgyan": sampleStl,
+      "Եվա Աբգարյան": sampleStl, // Replace with "models/yeva_faceless.stl"
+      "Yeva Abgaryan": sampleStl,
+      "Էմիլյա Նիկողոսյան": sampleStl, // Replace with "models/emilya.stl"
+      "Emilya Nikoghosyan": sampleStl
+    };
+
+    // 1. Attach click listeners to artist names dynamically
+    document.querySelectorAll('.name').forEach(nameEl => {
+      nameEl.classList.add('clickable-name');
+      nameEl.title = "Click to view 3D artwork";
+      
+      nameEl.addEventListener('click', () => {
+        const artistName = nameEl.innerText.trim();
+        const stlPath = artistModels[artistName];
+        
+        if (stlPath) {
+          openModal(stlPath);
+        } else {
+          console.warn("No 3D model path defined for:", artistName);
+        }
+      });
+    });
+
+    // 2. Three.js Core Variables
+    let scene, camera, renderer, controls, currentModel, reqId;
+    const modal = document.getElementById('stl-modal');
+    const container = document.getElementById('canvas-container');
+    const closeBtn = document.getElementById('close-modal');
+    const loadingText = document.getElementById('loading-text');
+
+    // 3. Modal Controls
+    function openModal(stlPath) {
+      modal.style.display = 'flex';
+      init3D(stlPath);
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+      if (reqId) cancelAnimationFrame(reqId);
+      if (renderer) {
+        container.removeChild(renderer.domElement);
+        renderer.dispose();
+      }
+      currentModel = null;
+      scene = null;
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      // Close if the user clicks on the dark overlay outside the popup
+      if (e.target === modal) closeModal(); 
+    });
+
+    // 4. Initialize Three.js Scene and Load STL
+    function init3D(stlPath) {
+      container.innerHTML = ''; // Clear previous renders
+      loadingText.style.display = 'block';
+      loadingText.innerText = 'Loading 3D Model...';
+
+      // Setup Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xf5f5f5); // Matches site aesthetic
+
+      // Setup Camera
+      camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+      camera.position.set(0, 0, 100);
+
+      // Setup Renderer
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      container.appendChild(renderer.domElement);
+
+      // Setup OrbitControls (Interaction)
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true; // Smooth drag feeling
+      controls.dampingFactor = 0.05;
+
+      // Setup Lighting (Crucial for 3D visibility)
+      const ambientLight = new THREE.AmbientLight(0x404040, 2);
+      scene.add(ambientLight);
+      
+      const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.5);
+      dirLight1.position.set(1, 1, 1).normalize();
+      scene.add(dirLight1);
+
+      const dirLight2 = new THREE.DirectionalLight(0xaaaaaa, 1.5);
+      dirLight2.position.set(-1, -1, -1).normalize();
+      scene.add(dirLight2);
+
+      // Setup STLLoader
+      const loader = new STLLoader();
+      
+      try {
+        loader.load(
+          stlPath, 
+          function (geometry) {
+            loadingText.style.display = 'none';
+
+            // Minimalist standard material
+            const material = new THREE.MeshStandardMaterial({ 
+              color: 0x909090, 
+              roughness: 0.4, 
+              metalness: 0.2 
+            });
+            
+            currentModel = new THREE.Mesh(geometry, material);
+
+            // Calculate bounding box and center the model mathematically
+            geometry.computeBoundingBox();
+            const boundingBox = geometry.boundingBox;
+            const center = new THREE.Vector3();
+            boundingBox.getCenter(center);
+            currentModel.position.sub(center);
+
+            // Calculate scale so any sized STL fits nicely on screen
+            const size = new THREE.Vector3();
+            boundingBox.getSize(size);
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const targetSize = 50; 
+            const scale = targetSize / maxDim;
+            currentModel.scale.set(scale, scale, scale);
+
+            // Add to a pivot group to ensure it rotates on its axis properly
+            const pivot = new THREE.Group();
+            scene.add(pivot);
+            pivot.add(currentModel);
+            currentModel = pivot; 
+
+            animate(); // Start render loop
+          },
+          function (xhr) {
+            // Progress bar behavior
+            if (xhr.total > 0) {
+              const percent = Math.round((xhr.loaded / xhr.total) * 100);
+              loadingText.innerText = `Loading: ${percent}%`;
+            }
+          },
+          function (error) {
+            console.error("Error loading STL:", error);
+            loadingText.innerText = "Error loading 3D model. File not found or invalid URL.";
+          }
+        );
+      } catch (err) {
+        console.error("Path error:", err);
+        loadingText.innerText = "Error: Invalid path for STL file.";
+      }
+
+      // Handle window resizing dynamically
+      window.addEventListener('resize', onWindowResize, false);
+    }
+
+    function onWindowResize() {
+      if (!camera || !renderer) return;
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    }
+
+    // 5. Animation Loop
+    function animate() {
+      reqId = requestAnimationFrame(animate);
+      
+      // Implement the slow automatic rotation
+      if (currentModel) {
+        currentModel.rotation.y += 0.003; 
+      }
+      
+      controls.update();
+      renderer.render(scene, camera);
+    }
+  </script>
 </body>
 </html>
