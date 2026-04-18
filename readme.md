@@ -148,4 +148,4 @@ Language switching is instant and preserves page position.
 **Project Type:** Artistic Exhibition & Activism Platform  
 **Location:** Gyumri, Armenia  
 **Language:** Armenian & English  
-**Last Updated:** April 18, 2026
+**Last Updated:** April 18, 2026ls
