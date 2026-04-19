@@ -1,905 +1,1276 @@
 <!DOCTYPE html>
 <html lang="hy">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="A bilingual art & activism exhibition centering women's voices and experiences in public spaces in Gyumri.">
-  <title>ազդ | azd</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A bilingual art & activism exhibition centering women's voices and experiences in public spaces in Gyumri.">
+    <title>ազդ | azd</title>
 
-  <!-- Միացնում ենք Google Fonts-ից Montserrat տառատեսակը -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Three.js Import Map -->
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-      }
-    }
-  </script>
-
-  <style>
-    /* Ընդհանուր ոճեր */
-    body {
-      margin: 0;
-      font-family: 'Montserrat', Arial, Helvetica, sans-serif;
-      background: #ffffff;
-      color: #111111;
-      line-height: 1.6;
-      transition: background 0.3s, color 0.3s;
-    }
-
-    .container {
-      width: calc(100% - 40px);
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 40px 0 80px;
-      box-sizing: border-box;
-    }
-
-    /* Վերին վահանակ և Լեզվի կոճակ */
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 60px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #eee;
-    }
-
-    .logo {
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: lowercase;
-    }
-
-    .lang-btn {
-      background: #111;
-      color: #fff;
-      border: 1px solid #111;
-      padding: 8px 16px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s ease;
-    }
-
-    .lang-btn:hover {
-      background: #fff;
-      color: #111;
-    }
-
-    /* Տեքստեր և Բաժիններ */
-    h1 {
-      text-align: center;
-      font-size: 28px;
-      font-weight: 700;
-      margin: 0 0 50px;
-      letter-spacing: 0.5px;
-    }
-
-    .section {
-      margin-bottom: 120px;
-    }
+    <!-- Import Maps Polyfill -->
+    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
     
-    .intro-section {
-      border-bottom: 1px solid #eee;
-      padding-bottom: 40px;
-    }
+    <!-- Three.js & Cannon.js Configuration -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+                "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"
+            }
+        }
+    </script>
 
-    .title {
-      font-size: 20px;
-      font-weight: 700;
-      line-height: 1.2;
-      margin: 0 0 20px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
+    <style>
+        /* --------------------------------------
+           Global Styles
+        --------------------------------------- */
+        body {
+            margin: 0;
+            font-family: 'Montserrat', Helvetica, Arial, sans-serif;
+            background: #ffffff;
+            color: #111111;
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
 
-    p {
-      font-size: 14px;
-      margin: 0 0 16px;
-      color: #333;
-    }
+        /* --------------------------------------
+           Hero 3D Physics Section
+        --------------------------------------- */
+        #hero-section {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-color: #0d0d0d;
+            color: #ffffff;
+            overflow: hidden;
+        }
 
-    /* Նոր ոճեր հեղինակի և ստեղծագործության անվանման համար */
-    .artist-signature {
-      margin-bottom: 30px;
-      text-align: right;
-    }
+        #ui-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            box-sizing: border-box;
+            z-index: 10;
+        }
 
-    .artist-signature .name {
-      font-size: 18px;
-      font-weight: 700;
-      color: #111;
-    }
+        #ui-layer header {
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 2s ease forwards 0.5s;
+            margin-top: -20vh;
+        }
 
-    .artist-signature .line {
-      height: 2px;
-      background-color: #111;
-      margin: 12px 0;
-      width: 100%;
-    }
+        #ui-layer h1 {
+            margin: 0;
+            font-size: 3rem;
+            font-weight: 300;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+        }
 
-    .artist-signature .artwork {
-      font-size: 14px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #666;
-    }
+        #ui-layer p.subtitle {
+            margin: 10px 0 0 0;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            color: #aaa;
+        }
 
-    .artist-signature .location {
-      font-size: 13px;
-      font-weight: 500;
-      color: #555;
-      text-decoration: none;
-      display: inline-block;
-      margin-top: 8px;
-      transition: color 0.2s;
-    }
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            animation: bounce 2s infinite;
+        }
 
-    .artist-signature .location:hover {
-      color: #111;
-      text-decoration: underline;
-    }
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #0d0d0d;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1s ease;
+        }
 
-    .artwork-img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 12px;
-      margin: 30px 0;
-      background-color: #f5f5f5;
-      object-fit: cover;
-    }
+        .loader {
+            text-align: center;
+            letter-spacing: 3px;
+            font-weight: 300;
+            font-size: 1.2rem;
+        }
 
-    /* Աջակցության բաժնի ոճեր */
-    .support-section {
-      background-color: #f9f9f9;
-      padding: 40px 30px;
-      border-radius: 12px;
-      border: 1px solid #eaeaea;
-      margin-top: 60px;
-    }
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+            touch-action: none;
+        }
+        
+        #canvas-container:active { cursor: grabbing; }
+        .pointer-active { cursor: pointer !important; }
 
-    .support-section .support-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      color: #111;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
 
-    .support-section .support-subtitle {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
+        /* --------------------------------------
+           Exhibition Content Styles
+        --------------------------------------- */
+        .content-container {
+            width: calc(100% - 40px);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 80px 0 80px;
+            box-sizing: border-box;
+            background: #ffffff;
+        }
 
-    .support-section .support-desc {
-      margin-bottom: 30px;
-      color: #555;
-      font-size: 14px;
-    }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
 
-    .support-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 30px;
-    }
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: lowercase;
+        }
 
-    .support-col h3 {
-      font-size: 18px;
-      margin-top: 0;
-      margin-bottom: 24px;
-      font-weight: 700;
-      border-bottom: 2px solid #111;
-      padding-bottom: 12px;
-      display: block;
-      max-width: 220px;
-    }
+        .lang-btn {
+            background: #111;
+            color: #fff;
+            border: 1px solid #111;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
 
-    .support-table {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      column-gap: 24px;
-      row-gap: 20px;
-      font-size: 14px;
-      line-height: 1.5;
-      align-items: start;
-    }
+        .lang-btn:hover {
+            background: #fff;
+            color: #111;
+        }
 
-    .support-table .fw-bold {
-      font-weight: 700;
-      color: #111;
-    }
+        .content-container h1.exhibition-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 50px;
+            letter-spacing: 0.5px;
+        }
 
-    .support-table .full-width {
-      grid-column: 1 / -1;
-    }
+        .section {
+            margin-bottom: 120px;
+            padding-top: 40px; /* Offset for smooth scrolling */
+        }
+        
+        .intro-section {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 40px;
+            margin-bottom: 80px;
+        }
 
-    .support-table a {
-      color: #111;
-      text-decoration: underline;
-    }
+        .title {
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin: 0 0 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-    .support-table a:hover {
-      text-decoration: none;
-    }
+        p {
+            font-size: 14px;
+            margin: 0 0 16px;
+            color: #333;
+        }
 
-    /* 3D Viewer & Modal Styles */
-    .clickable-name {
-      cursor: pointer;
-      position: relative;
-      display: inline-block;
-      transition: color 0.3s;
-    }
-    .clickable-name:hover {
-      color: #666;
-    }
-    .clickable-name::after {
-      content: ' ⟲'; /* 3D rotation symbol indication */
-      font-size: 14px;
-      opacity: 0.5;
-    }
-    
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.8);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      backdrop-filter: blur(5px);
-    }
-    
-    .modal-content {
-      background: #111; /* Changed to match dark theme */
-      width: 90%;
-      max-width: 800px;
-      height: 80vh;
-      border-radius: 12px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .close-btn {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 28px;
-      cursor: pointer;
-      z-index: 10;
-      color: #333;
-      background: rgba(255,255,255,0.8);
-      border: none;
-      border-radius: 50%;
-      width: 40px; height: 40px;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s;
-    }
-    .close-btn:hover { background: #fff; }
-    
-    #canvas-container {
-      width: 100%;
-      height: 100%;
-      background: #111111; /* Changed to black/dark background */
-    }
-    
-    #loading-text {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      font-weight: 600;
-      color: #eeeeee; /* Lightened text for dark background */
-      pointer-events: none;
-      text-align: center;
-    }
+        .artist-signature {
+            margin-bottom: 30px;
+            text-align: right;
+        }
 
-    /* Լեզուների ցուցադրման տրամաբանություն (CSS) */
-    body.lang-hy .en { display: none; }
-    body.lang-en .hy { display: none; }
+        .artist-signature .name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .artist-signature .name:hover {
+            color: #666;
+        }
 
-    @media (min-width: 768px) {
-      .container {
-        padding: 60px 0 100px;
-      }
-      h1 {
-        font-size: 40px;
-        margin-bottom: 70px;
-      }
-      .section {
-        margin-bottom: 180px;
-      }
-      p {
-        font-size: 16px;
-      }
-      .title {
-        font-size: 24px;
-      }
-      .artist-signature .name {
-        font-size: 22px;
-      }
-      .artist-signature .artwork {
-        font-size: 16px;
-      }
-      .artist-signature .location {
-        font-size: 14px;
-      }
-      .support-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 60px;
-      }
-      .support-section {
-        padding: 50px;
-      }
-    }
-  </style>
+        .artist-signature .line {
+            height: 2px;
+            background-color: #111;
+            margin: 12px 0;
+            width: 100%;
+        }
+
+        .artist-signature .artwork {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+        }
+
+        .artist-signature .location {
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 8px;
+            transition: color 0.2s;
+        }
+
+        .artist-signature .location:hover {
+            color: #111;
+            text-decoration: underline;
+        }
+
+        /* Icon styling */
+        .icon-3d {
+            margin-left: 10px;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            opacity: 0.8;
+            transition: transform 0.3s ease;
+        }
+        .artist-signature .name:hover .icon-3d {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+
+        /* Support Section */
+        .support-section {
+            background-color: #f9f9f9;
+            padding: 40px 30px;
+            border-radius: 12px;
+            border: 1px solid #eaeaea;
+            margin-top: 60px;
+        }
+
+        .support-section .support-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #111;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .support-section .support-subtitle {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .support-section .support-desc {
+            margin-bottom: 30px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .support-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .support-col h3 {
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 24px;
+            font-weight: 700;
+            border-bottom: 2px solid #111;
+            padding-bottom: 12px;
+            display: block;
+            max-width: 220px;
+        }
+
+        .support-table {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            column-gap: 24px;
+            row-gap: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            align-items: start;
+        }
+
+        .support-table .fw-bold { font-weight: 700; color: #111; }
+        .support-table .full-width { grid-column: 1 / -1; }
+        .support-table a { color: #111; text-decoration: underline; }
+        .support-table a:hover { text-decoration: none; }
+
+        /* 3D Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: #111;
+            width: 90%;
+            max-width: 800px;
+            height: 80vh;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            z-index: 10;
+            color: #333;
+            background: rgba(255,255,255,0.8);
+            border: none;
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .close-btn:hover { background: #fff; }
+        
+        #modal-canvas-container {
+            width: 100%;
+            height: 100%;
+            background: #111111;
+        }
+        
+        #modal-loading-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: 600;
+            color: #eeeeee;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        /* Language Toggle Logic */
+        body.lang-hy .en { display: none; }
+        body.lang-en .hy { display: none; }
+
+        @media (min-width: 768px) {
+            #ui-layer h1 { font-size: 4rem; }
+            .content-container { padding: 60px 0 100px; }
+            .content-container h1.exhibition-title { font-size: 40px; margin-bottom: 70px; }
+            .section { margin-bottom: 180px; }
+            p { font-size: 16px; }
+            .title { font-size: 24px; }
+            .artist-signature .name { font-size: 22px; }
+            .artist-signature .artwork { font-size: 16px; }
+            .artist-signature .location { font-size: 14px; }
+            .support-grid { grid-template-columns: 1fr 1fr; gap: 60px; }
+            .support-section { padding: 50px; }
+        }
+
+        /* Scroll Reveal Animation Styles */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.5, 0, 0, 1), transform 0.8s cubic-bezier(0.5, 0, 0, 1);
+            will-change: opacity, transform;
+        }
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
 <body class="lang-hy">
 
-  <div class="container">
-    
-    <!-- Header -->
-    <header class="topbar">
-      <div class="logo">
-        <span class="hy">ազդ</span>
-        <span class="en">azd</span>
-      </div>
-      <button class="lang-btn" aria-label="Toggle language between Armenian and English" onclick="toggleLanguage()">
-        <span class="hy">English</span>
-        <span class="en">Հայերեն</span>
-      </button>
-    </header>
-
-    <main>
-      <!-- Main Title -->
-      <h1>
-        <span class="hy">ազդ</span>
-        <span class="en">azd</span>
-      </h1>
-
-      <!-- Ներածական տեքստ (Ընդհանուր նախագծի մասին) -->
-      <section class="section intro-section">
-        <div class="hy">
-          <p>Գյումրիում, որտեղ հանրային տարածքը ձևավորվել է հիմնականում տղամարդկանց ներկայությամբ և հայացքով, կնոջ ձայնը հաճախ մնում է սահմանափակված՝ լռեցված, մղված դեպի անձնական տարածք։ Այս նախագիծը կենտրոնացնում է հենց կնոջ ներկայությունը՝ որպես գործողություն, որպես միջամտություն, որպես նոր ձևակերպվող իրականություն։</p>
-          <p>Այն վերագրավում է քաղաքային տարածքը կանանց միջոցով՝ դարձնելով նրանց ոչ միայն տեսանելի, այլև ձևավորող ուժ։ Այստեղ կինը այլևս օբյեկտ չէ, այլ սուբյեկտ, որը խոսում է, նշանավորում և վերաձևակերպում է միջավայրը իր փորձով, մարմնով և հիշողությամբ։</p>
-          <p>Հանրային տարածքը դառնում է այդ ներկայության նյութական արտահայտությունը՝ մի դաշտ, որտեղ կնոջ ձայնը դուրս է գալիս փակ տարածքներից և վերածվում է հավաքական, տեսանելի և անշրջելի ներկայության։</p>
+    <!-- Loading Screen for 3D Hero -->
+    <div id="loading-screen">
+        <div class="loader">
+            INITIALIZING SPACE... <br><br>
+            <span id="progress-text">0%</span>
         </div>
-        <div class="en">
-          <p>In Gyumri, where public space has been shaped predominantly by male presence and gaze, women’s voices are often constrained—silenced or confined to the private sphere. This project centers the presence of women as an act, as an intervention, as a redefinition of reality.</p>
-          <p>It reclaims urban space through women, positioning them not only as visible but as active agents of transformation. Here, the woman is no longer an object, but a subject—one who speaks, marks, and reshapes the environment through her experience, body, and memory.</p>
-          <p>Public space becomes the material expression of this presence: a field where women’s voices move beyond containment and emerge as collective, visible, and irreversible.</p>
-        </div>
-      </section>
-
-      <!-- Բաժին 1: Սյուզի Գինոսյան -->
-      <section class="section">
-        <div class="hy">
-          <div class="artist-signature">
-            <div class="name">Սյուզի Գինոսյան</div>
-            <div class="line"></div>
-            <div class="artwork">կապ</div>
-            <a href="https://www.google.com/maps/place/Central+Park/@40.7850871,43.8328931,17z/data=!3m1!4b1!4m6!3m5!1s0x4041fc754e297085:0x9e8d0bd8b05d3d5d!8m2!3d40.7850871!4d43.835468!16s%2Fg%2F1td0d_2j?entry=ttu&g_ep=EgoyMDI2MDMyNC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" class="location">📍 location</a>
-          </div>
-          <p>Անհատը ինքնաբավ չէ․ այն մշտապես ձևավորվում է արտաքին հայացքների և միջամտությունների ներսում։ «Ես»-ը կայուն չէ, այլ դաշտ է, որի վրա միաժամանակ ներգործում են տարբեր կամքեր՝ փորձելով այն ձևավորել իրենց պատկերացմամբ։</p>
-          <p>Թելը այստեղ դառնում է կապի և սահմանի միաժամանակյա նշան․ այն միավորում է, բայց նաև սահմանափակում։ Խնամքի, վերահսկման և պատկանելիության միջև սահմանը խամրում է, իսկ բազմակի ուղղորդումները վերածվում են խճճվածության։</p>
-          <p>Այս խճճվածությունը ստեղծում է ոչ թե շարժում, այլ անշարժություն․ տարբեր «ճիշտ» ուղղություններ չեղարկում են միմյանց։ Ինքնությունը դառնում է դժվար ընթեռնելի, ներքին առանցքը՝ մթագնած։</p>
-          <p>Քանդակը հարցադրում է․ հնարավո՞ր է ազատությունը այնտեղ, որտեղ ինքնությունը կառուցվում է այլոց հայացքի ներքո։ Որտե՞ղ են ավարտվում արտաքին սահմանումները, և որտե՞ղ են սկսվում անձնական սահմանները։</p>
-        </div>
-        <div class="en">
-          <div class="artist-signature">
-            <div class="name">Suzy Ginosyan</div>
-            <div class="line"></div>
-            <div class="artwork">bond</div>
-            <a href="https://www.google.com/maps/place/Central+Park/@40.7850871,43.8328931,17z/data=!3m1!4b1!4m6!3m5!1s0x4041fc754e297085:0x9e8d0bd8b05d3d5d!8m2!3d40.7850871!4d43.835468!16s%2Fg%2F1td0d_2j?entry=ttu&g_ep=EgoyMDI2MDMyNC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" class="location">📍 location</a>
-          </div>
-          <p>The individual is not self-contained, but continuously shaped through external gazes and interventions. The “self” emerges not as a stable entity, but as a field where multiple wills act simultaneously, attempting to define it.</p>
-          <p>The thread functions as both connection and boundary—binding while constraining. It reveals the blurred threshold between care, control, and belonging, as multiple directions accumulate into entanglement.</p>
-          <p>This entanglement produces not movement, but stillness: competing “correct” trajectories cancel one another out. Identity becomes difficult to read, its inner axis obscured.</p>
-          <p>The work questions whether freedom is possible where identity is formed under the gaze of others, and where external definitions end as personal boundaries begin.</p>
-        </div>
-      </section>
-
-      <!-- Բաժին 2: Անի Խաչատրյան -->
-      <section class="section">
-        <img src="placeholder.jpg" alt="Abstract artwork representing the human body and equality" class="artwork-img" onerror="this.style.display='none'">
-        <div class="hy">
-          <div class="artist-signature">
-            <div class="name">Անի Խաչատրյան</div>
-            <div class="line"></div>
-            <div class="artwork">մարմին</div>
-          </div>
-          <p>Մարդը այս աշխարհում ամենաեզակի և արարչական երևույթներից մեկն է։ Մարդկային ոգին ու բնազդը այնպիսի խորություն ունեն, որ ոչինչ չի կարող ամբողջությամբ չափել կամ սահմանել դրանք։ Թե տղամարդը, թե կինը բնության ստեղծագործություններ են՝ երբեմն հանգիստ, երբեմն փոթորկոտ, երբեմն էլ անսահման ուժով լի։ Հենց այստեղից էլ ծնվում է հավասարության գաղափարը՝ այն միտքը, որ բոլոր մարդիկ ունեն նույն արժեքը, նույն իրավունքը՝ անկախ սեռից կամ ընտրությունից։</p>
-          <p>Մարդու մարմինը նման է անծայրածիր օվկիանոսի՝ միաժամանակ խաղաղ ու ալեկոծ, խոր ու անհասկանալի։</p>
-          <p>Եվ ֆեմինիստական գաղափարը չի ոգևորում կանանց, կոտրելով տղամարդու կերպարը։ Այլ հավասար նորմերի է վերածում մարդկային հարաբերությունները։</p>
-        </div>
-        <div class="en">
-          <div class="artist-signature">
-            <div class="name">Ani Khachatryan</div>
-            <div class="line"></div>
-            <div class="artwork">Body</div>
-          </div>
-          <p>Humans are among the most unique and creative phenomena in this world. The human spirit and instinct possess such depth that nothing can fully measure or define them. Both men and women are creations of nature—sometimes calm, sometimes stormy, and sometimes filled with infinite strength. This is where the idea of equality is born: the thought that all people have the same value, the same rights, regardless of gender or choices.</p>
-          <p>The human body is like a boundless ocean—simultaneously peaceful and turbulent, deep and incomprehensible.</p>
-          <p>And the feminist idea does not empower women by breaking down the image of the man. Rather, it transforms human relationships into equal norms.</p>
-        </div>
-      </section>
-
-      <!-- Բաժին 3: Նուշ Պետրոսյան -->
-      <section class="section">
-        <div class="hy">
-          <div class="artist-signature">
-            <div class="name">Նուշ Պետրոսյան</div>
-            <div class="line"></div>
-            <div class="artwork">Ձայն</div>
-          </div>
-          <p>Նույնիսկ եթե ձայն ունես, կարո՞ղ ես իսկապես խոսել։</p>
-          <p>Ոչ ոք ֆիզիկապես քեզ չի կանգնեցնում, ոչ ոք չի լռեցնում, բայց քննադատվելու վախը բառերը կողպում է կոկորդում։ Սա մի թեմա է, որը ո՛չ կարող ես կուլ տալ, ո՛չ էլ արտաբերել։ Բայց միայն այդ վախի բացակայության դեպքում խոսելը կարող է ավելի անվտանգ թվալ, քան լռությունը։</p>
-        </div>
-        <div class="en">
-          <div class="artist-signature">
-            <div class="name">Nush Petrosyan</div>
-            <div class="line"></div>
-            <div class="artwork">Voice</div>
-          </div>
-          <p>Even if you have a voice, can you really speak?</p>
-          <p>Sure, you can talk. Nobody physically stops you, but the fear of judgement keeps the words locked in your throat. It’s a topic which you can’t swallow but also can’t spit it out. Only without that fear can speaking feel safer than silence.</p>
-        </div>
-      </section>
-
-      <!-- Բաժին 4: Գրետա Գրիգորյան -->
-      <section class="section">
-        <div class="hy">
-          <div class="artist-signature">
-            <div class="name">Գրետա Գրիգորյան</div>
-            <div class="line"></div>
-            <div class="artwork">Անահիտ</div>
-          </div>
-          <p>Այս նախագիծը ուսումնասիրում է տարբեր լինելու հուզական ծանրությունը փոքր քաղաքում, որտեղ անհատականությունը հաճախ դառնում է մեկուսացման պատճառ, ոչ թե ազատության։</p>
-          <p>Կերպարը ներկայացնում է մի մարդու, ով հրաժարվում է կորցնել իր ինքնությունը՝ նույնիսկ մշտական հասարակական ճնշման պայմաններում։</p>
-          <p>Այնպիսի վայրում, որտեղ բոլորը ճանաչում են միմյանց, առանձնանալը քեզ դարձնում է օտար, գրեթե՝ այլմոլորակային։ Անծանոթը դառնում է անհարմար մյուսների համար, և այդ անհարմարությունը վերածվում է շշուկների, դատողությունների և քո մասին տարածվող բամբասանքների։</p>
-          <p>Այս բոլոր խոսքերն ու կարծիքները սկսում են ծանրանալ, կարծես մի բան սեղմում է կոկորդդ։ Դառնում է դժվար ապրել ազատ ու պարզապես լինել այն, ինչ դու ես։</p>
-          <p>Նախագիծը ցույց է տալիս ընդունված լինելու և յուրահատուկ մնալու միջև պայքարը։ Այն ընդգծում է, թե որքան դժվար, բայց միևնույն ժամանակ կարևոր է մնալ ինքդ քեզ՝ անկախ նրանից, թե ինչ են ասում մյուսները։</p>
-        </div>
-        <div class="en">
-          <div class="artist-signature">
-            <div class="name">Greta Grigoryan</div>
-            <div class="line"></div>
-            <div class="artwork">Anahit</div>
-          </div>
-          <p>This project explores the emotional weight of being different in a small city, where individuality often becomes a source of isolation rather than freedom. The character represents a person who refuses to lose their identity, even under constant social pressure.</p>
-          <p>In a place where everyone knows each other, standing out makes you feel like an outsider, almost like an alien. The unfamiliar becomes uncomfortable for others, and this discomfort turns into whispers, judgment, and gossip behind your back.</p>
-          <p>All these words and opinions start to feel heavy, like something tightening around your neck. It becomes difficult to live freely and just be yourself. The project shows the struggle between being accepted and staying unique. It highlights how difficult, but important it is to remain yourself, no matter what others say.</p>
-        </div>
-      </section>
-
-      <!-- Բաժին 5: Շահանե Հարությունյան -->
-      <section class="section">
-        <img src="IMG_7889.jpg" alt="Misfit artwork portraying a heart enclosed in a cage, symbolizing societal constraints" class="artwork-img" onerror="this.style.display='none'">
-        <div class="hy">
-          <div class="artist-signature">
-            <div class="name">Շահանե Հարությունյան</div>
-            <div class="line"></div>
-            <div class="artwork">միսֆիթ</div>
-          </div>
-          <p>Այս աշխատանքը արտացոլում է, թե ինչպես են սոցիալական սպասումները աննկատ ձևավորում և սահմանափակում մարդկանց, հատկապես կանանց՝ սահմանափակելով նրանց ներքին աշխարհի արտահայտումը։</p>
-          <p>Սիրտը խորհրդանշում է ինքնությունը, հույզերն ու խոցելիությունը, իսկ վանդակը՝ հասարակության, ավանդույթների և դատողության մշտական ճնշումը։</p>
-        </div>
-        <div class="en">
-          <div class="artist-signature">
-            <div class="name">Shahane Harutyunyan</div>
-            <div class="line"></div>
-            <div class="artwork">Misfit</div>
-          </div>
-          <p>This piece reflects the way social expectations quietly shape and confine people, especially women, limiting the expression of their inner selves.</p>
-          <p>The heart symbolizes identity, emotion, and vulnerability, while the cage represents the constant pressure of society, tradition, and judgment.</p>
-        </div>
-      </section>
-
-      <!-- Բաժին 6: Ջենի Գևորգյան -->
-      <section class="section">
-        <div class="hy">
-          <div class="artist-signature">
-            <div class="name">Ջենի Գևորգյան</div>
-            <div class="line"></div>
-            <div class="artwork">Պայքարից հանգստանալու թույլտվություն</div>
-          </div>
-          <p>Գուցե դանակի տեղը իրականությունն է, որ ստիպում է փակել աչքերդ։</p>
-        </div>
-        <div class="en">
-          <div class="artist-signature">
-            <div class="name">Jenny Gevorgyan</div>
-            <div class="line"></div>
-            <div class="artwork">Permission to rest from the struggle</div>
-          </div>
-          <p>Maybe instead of a knife, reality is what forces you to close your eyes.</p>
-        </div>
-      </section>
-
-      <!-- Բաժին 7: Եվա Աբգարյան -->
-      <section class="section">
-        <div class="hy">
-          <div class="artist-signature">
-            <div class="name">Եվա Աբգարյան</div>
-            <div class="line"></div>
-            <div class="artwork">Faceless</div>
-          </div>
-          <p>Արվեստի գործն ինքնին խոսում է իր մասին. այն պատկերում է ինձ նման մի աղջկա, որը ձեռքին երկու դիմակ է պահում. մեկը ժպտում է, մյուսը՝ ավելի մեծ ժպտում, կարծես սրանք միակ դեմքերն են, որոնցից նրան թույլատրվում է ընտրել: Դրանց տակ նրա իրական դեմքն է՝ արցունքոտ և անխորտակ աչքեր, կարծես ներսում ինչ-որ բան խլվել է: Ես միշտ զգացել եմ ճնշում՝ ավելի հանգիստ, մեղմ, աշխարհին ավելի հաճելի լինելու համար, ուստի այս ընտրությունը դառնում է գոյության միջոց՝ այն ցավոտ է թվում, բայց պահպանում է ներդաշնակություն՝ ինձ հեռացնելով այն զգացողությունից, թե ինչը կարող է սխալ ընթանալ:</p>
-        </div>
-        <div class="en">
-          <div class="artist-signature">
-            <div class="name">Yeva Abgaryan</div>
-            <div class="line"></div>
-            <div class="artwork">Faceless</div>
-          </div>
-          <p>The artwork speaks for itself-it shows a girl, looking like me, holding two masks: one smiling, another smiling even bigger, as if these are the only faces she is allowed to choose from. Beneath them, her real face-eyes in tears and depthless, as if something inside has been taken away. I’ve always felt a pressure to be calmer, softer, more likable to the world, so this choice becomes a way to exist-it feels painful, but keeps a fragile harmony by distancing me from the feeling of what might go wrong.</p>
-        </div>
-      </section>
-
-      <!-- Բաժին 8: Էմիլյա Նիկողոսյան -->
-      <section class="section">
-        <div class="hy">
-          <div class="artist-signature">
-            <div class="name">Էմիլյա Նիկողոսյան</div>
-            <div class="line"></div>
-          </div>
-          <p>Մեր աշխարհի ներսում կան բազմաթիվ այլ աշխարհներ։</p>
-          <p>Հնարավոր է՝ այլևս ասելու ոչինչ չկա—</p>
-          <p>բացի նրանից, որ երբեմն դրանք անդրադարձվում են մեզ։</p>
-        </div>
-        <div class="en">
-          <div class="artist-signature">
-            <div class="name">Emilya Nikoghosyan</div>
-            <div class="line"></div>
-          </div>
-          <p>Inside our world, there are many other worlds.</p>
-          <p>Maybe nothing more needs to be said—</p>
-          <p>except that sometimes, they reflect back.</p>
-        </div>
-      </section>
-    </main>
-
-    <!-- Աջակցության և Ռեսուրսների Բաժին -->
-    <footer class="support-section">
-      
-      <!-- Հայերեն տարբերակ -->
-      <div class="hy">
-        <div class="support-title">Աջակցություն և Ռեսուրսներ</div>
-        <div class="support-subtitle">Եթե դուք ենթարկվել եք սեռական բռնության, դուք մենակ չեք։</div>
-        <p class="support-desc">Օգնություն կա։ Լուռ։ Գաղտնի։ Առանց դատապարտելու։</p>
-        
-        <div class="support-grid">
-          <div class="support-col">
-            <h3>Զանգահարեք</h3>
-            <div class="support-table">
-              <div class="fw-bold">102</div>
-              <div>Ոստիկանություն</div>
-              
-              <div class="fw-bold">103</div>
-              <div>Շտապօգնություն</div>
-              
-              <div class="fw-bold">+374 93 568 080</div>
-              <div>Կանանց աջակցման կենտրոն (24/7)</div>
-              
-              <div class="fw-bold">+374 77 991 280</div>
-              <div>Սեռական բռնության ճգնաժամային կենտրոն</div>
-            </div>
-          </div>
-          <div class="support-col">
-            <h3>Դիմեք</h3>
-            <div class="support-table">
-              <div class="full-width"><a href="https://saccarmenia.org/en_us/%D5%B4%D5%A5%D6%80-%D5%B4%D5%A1%D5%BD%D5%AB%D5%B6/" target="_blank" rel="noopener noreferrer">Սեռական բռնության ճգնաժամային կենտրոն</a></div>
-              <div class="full-width"><a href="https://womenfundarmenia.org/" target="_blank" rel="noopener noreferrer">Կանանց Հիմնադրամ Հայաստան</a></div>
-              <div class="full-width"><a href="https://womensrightshouse.org/about-us/" target="_blank" rel="noopener noreferrer">Կանանց իրավունքների տուն</a></div>
-              <div class="full-width"><a href="https://womenofarmenia.org/" target="_blank" rel="noopener noreferrer">Կանանց ռեսուրսային կենտրոն</a></div>
-              <div class="fw-bold"><a href="https://safeyou.space/en" target="_blank" rel="noopener noreferrer">Safe YOU</a></div>
-              <div>բջջային աջակցության ցանց</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Անգլերեն տարբերակ -->
-      <div class="en">
-        <div class="support-title">Support & Resources</div>
-        <div class="support-subtitle">If you have experienced sexual violence, you are not alone.</div>
-        <p class="support-desc">Help exists. Quietly. Confidentially. Without judgment.</p>
-        
-        <div class="support-grid">
-          <div class="support-col">
-            <h3>Call</h3>
-            <div class="support-table">
-              <div class="fw-bold">102</div>
-              <div>Police</div>
-              
-              <div class="fw-bold">103</div>
-              <div>Ambulance</div>
-              
-              <div class="fw-bold">+374 93 568 080</div>
-              <div>Women’s Support Center (24/7)</div>
-              
-              <div class="fw-bold">+374 77 991 280</div>
-              <div>Sexual Assault Crisis Center</div>
-            </div>
-          </div>
-          <div class="support-col">
-            <h3>Reach</h3>
-            <div class="support-table">
-              <div class="full-width"><a href="https://saccarmenia.org/en_us/" target="_blank" rel="noopener noreferrer">Sexual Assault Crisis Center</a></div>
-              <div class="full-width"><a href="https://womenfundarmenia.org/" target="_blank" rel="noopener noreferrer">Women's Fund Armenia</a></div>
-              <div class="full-width"><a href="https://womensrightshouse.org/about-us/" target="_blank" rel="noopener noreferrer">Women's Rights House</a></div>
-              <div class="full-width"><a href="https://womenofarmenia.org/" target="_blank" rel="noopener noreferrer">Women's Resource Center</a></div>
-              <div class="fw-bold"><a href="https://safeyou.space/en" target="_blank" rel="noopener noreferrer">Safe YOU</a></div>
-              <div>mobile support network</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </footer>
-
-  </div>
-
-  <!-- JavaScript լեզվի փոփոխության համար -->
-  <script>
-    function toggleLanguage() {
-      const body = document.body;
-      if (body.classList.contains('lang-hy')) {
-        body.classList.remove('lang-hy');
-        body.classList.add('lang-en');
-        document.documentElement.lang = "en";
-      } else {
-        body.classList.remove('lang-en');
-        body.classList.add('lang-hy');
-        document.documentElement.lang = "hy";
-      }
-    }
-  </script>
-
-  <!-- 3D Modal Structure -->
-  <div id="stl-modal" class="modal-overlay">
-    <div class="modal-content">
-      <button class="close-btn" id="close-modal" aria-label="Close modal">&times;</button>
-      <div id="loading-text">Loading 3D Model...</div>
-      <div id="canvas-container"></div>
     </div>
-  </div>
 
-  <!-- 3D Viewer Logic (Three.js) -->
-  <script type="module">
-    import * as THREE from 'three';
-    import { STLLoader } from 'three/addons/loaders/STLLoader.js';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    <!-- ==========================================
+         HERO SECTION (3D Physics Canvas)
+    =========================================== -->
+    <section id="hero-section">
+        <!-- Text overlay removed to focus entirely on the chaotic 3D models -->
+        <div id="canvas-container"></div>
+    </section>
 
-    // Data Structure mapping artists to their respective STL files.
-    const artistModels = {
-      "Սյուզի Գինոսյան": "models/suzy.stl",
-      "Suzy Ginosyan": "models/suzy.stl",
-      "Անի Խաչատրյան": "models/ani.stl",
-      "Ani Khachatryan": "models/ani.stl",
-      "Նուշ Պետրոսյան": "models/nush.stl",
-      "Nush Petrosyan": "models/nush.stl",
-      "Գրետա Գրիգորյան": "models/greta.stl",
-      "Greta Grigoryan": "models/greta.stl",
-      "Շահանե Հարությունյան": "models/shahane.stl",
-      "Shahane Harutyunyan": "models/shahane.stl",
-      "Ջենի Գևորգյան": "models/jenny.stl",
-      "Jenny Gevorgyan": "models/jenny.stl",
-      "Եվա Աբգարյան": "models/yeva.stl",
-      "Yeva Abgaryan": "models/yeva.stl",
-      "Էմիլյա Նիկողոսյան": "models/emilya.stl",
-      "Emilya Nikoghosyan": "models/emilya.stl"
-    };
-
-    // 1. Attach click listeners to artist names dynamically
-    document.querySelectorAll('.name').forEach(nameEl => {
-      nameEl.classList.add('clickable-name');
-      nameEl.title = "Click to view 3D artwork";
-      
-      nameEl.addEventListener('click', () => {
-        const artistName = nameEl.innerText.trim();
-        const stlPath = artistModels[artistName];
+    <!-- ==========================================
+         MAIN EXHIBITION CONTENT
+    =========================================== -->
+    <div class="content-container">
         
-        if (stlPath) {
-          openModal(stlPath);
-        } else {
-          console.warn("No 3D model path defined for:", artistName);
-        }
-      });
-    });
+        <header class="topbar">
+            <div class="logo">
+                <span class="hy">ազդ</span>
+                <span class="en">azd</span>
+            </div>
+            <button class="lang-btn" aria-label="Toggle language" onclick="toggleLanguage()">
+                <span class="hy">English</span>
+                <span class="en">Հայերեն</span>
+            </button>
+        </header>
 
-    // 2. Three.js Core Variables
-    let scene, camera, renderer, controls, currentModel, reqId;
-    const modal = document.getElementById('stl-modal');
-    const container = document.getElementById('canvas-container');
-    const closeBtn = document.getElementById('close-modal');
-    const loadingText = document.getElementById('loading-text');
+        <main>
+            <h1 class="exhibition-title">
+                <span class="hy">ազդ</span>
+                <span class="en">azd</span>
+            </h1>
 
-    // 3. Modal Controls
-    function openModal(stlPath) {
-      modal.style.display = 'flex';
-      init3D(stlPath);
-    }
+            <section class="section intro-section">
+                <div class="hy">
+                    <p>Գյումրիում, որտեղ հանրային տարածքը ձևավորվել է հիմնականում տղամարդկանց ներկայությամբ և հայացքով, կնոջ ձայնը հաճախ մնում է սահմանափակված՝ լռեցված, մղված դեպի անձնական տարածք։ Այս նախագիծը կենտրոնացնում է հենց կնոջ ներկայությունը՝ որպես գործողություն, որպես միջամտություն, որպես նոր ձևակերպվող իրականություն։</p>
+                    <p>Այն վերագրավում է քաղաքային տարածքը կանանց միջոցով՝ դարձնելով նրանց ոչ միայն տեսանելի, այլև ձևավորող ուժ։ Այստեղ կինը այլևս օբյեկտ չէ, այլ սուբյեկտ, որը խոսում է, նշանավորում և վերաձևակերպում է միջավայրը իր փորձով, մարմնով և հիշողությամբ։</p>
+                    <p>Հանրային տարածքը դառնում է այդ ներկայության նյութական արտահայտությունը՝ մի դաշտ, որտեղ կնոջ ձայնը դուրս է գալիս փակ տարածքներից և վերածվում է հավաքական, տեսանելի և անշրջելի ներկայության։</p>
+                </div>
+                <div class="en">
+                    <p>In Gyumri, where public space has been shaped predominantly by male presence and gaze, women’s voices are often constrained—silenced or confined to the private sphere. This project centers the presence of women as an act, as an intervention, as a redefinition of reality.</p>
+                    <p>It reclaims urban space through women, positioning them not only as visible but as active agents of transformation. Here, the woman is no longer an object, but a subject—one who speaks, marks, and reshapes the environment through her experience, body, and memory.</p>
+                    <p>Public space becomes the material expression of this presence: a field where women’s voices move beyond containment and emerge as collective, visible, and irreversible.</p>
+                </div>
+            </section>
 
-    function closeModal() {
-      modal.style.display = 'none';
-      if (reqId) cancelAnimationFrame(reqId);
-      if (renderer) {
-        container.removeChild(renderer.domElement);
-        renderer.dispose();
-      }
-      currentModel = null;
-      scene = null;
-    }
+            <!-- 
+                Reusable SVG for the 3D Icon based on user request (Cube in circle)
+            -->
+            <template id="icon-3d-template">
+                <svg class="icon-3d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="m7.5 8 4.5 2.5L16.5 8"></path>
+                    <path d="M12 10.5V16"></path>
+                    <path d="m7.5 13.5 4.5 2.5 4.5-2.5"></path>
+                    <path d="M7.5 8v5.5"></path>
+                    <path d="M16.5 8v5.5"></path>
+                </svg>
+            </template>
 
-    closeBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => {
-      // Close if the user clicks on the dark overlay outside the popup
-      if (e.target === modal) closeModal(); 
-    });
+            <section id="section-suzy" class="section">
+                <div class="hy">
+                    <div class="artist-signature">
+                        <div class="name">Սյուզի Գինոսյան<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                        <div class="artwork">կապ</div>
+                        <a href="https://www.google.com/maps/place/Central+Park/@40.7850871,43.8328931,17z/data=!3m1!4b1!4m6!3m5!1s0x4041fc754e297085:0x9e8d0bd8b05d3d5d!8m2!3d40.7850871!4d43.835468!16s%2Fg%2F1td0d_2j?entry=ttu&g_ep=EgoyMDI2MDMyNC4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="location">📍 location</a>
+                    </div>
+                    <p>Անհատը ինքնաբավ չէ․ այն մշտապես ձևավորվում է արտաքին հայացքների և միջամտությունների ներսում։ «Ես»-ը կայուն չէ, այլ դաշտ է, որի վրա միաժամանակ ներգործում են տարբեր կամքեր՝ փորձելով այն ձևավորել իրենց պատկերացմամբ։</p>
+                    <p>Թելը այստեղ դառնում է կապի և սահմանի միաժամանակյա նշան․ այն միավորում է, բայց նաև սահմանափակում։ Խնամքի, վերահսկման և պատկանելիության միջև սահմանը խամրում է, իսկ բազմակի ուղղորդումները վերածվում են խճճվածության։</p>
+                    <p>Այս խճճվածությունը ստեղծում է ոչ թե շարժում, այլ անշարժություն․ տարբեր «ճիշտ» ուղղություններ չեղարկում են միմյանց։ Ինքնությունը դառնում է դժվար ընթեռնելի, ներքին առանցքը՝ մթագնած։</p>
+                    <p>Քանդակը հարցադրում է․ հնարավո՞ր է ազատությունը այնտեղ, որտեղ ինքնությունը կառուցվում է այլոց հայացքի ներքո։ Որտե՞ղ են ավարտվում արտաքին սահմանումները, և որտե՞ղ են սկսվում անձնական սահմանները։</p>
+                </div>
+                <div class="en">
+                    <div class="artist-signature">
+                        <div class="name">Suzy Ginosyan<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                        <div class="artwork">bond</div>
+                        <a href="https://www.google.com/maps/place/Central+Park/@40.7850871,43.8328931,17z/data=!3m1!4b1!4m6!3m5!1s0x4041fc754e297085:0x9e8d0bd8b05d3d5d!8m2!3d40.7850871!4d43.835468!16s%2Fg%2F1td0d_2j?entry=ttu&g_ep=EgoyMDI2MDMyNC4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="location">📍 location</a>
+                    </div>
+                    <p>The individual is not self-contained, but continuously shaped through external gazes and interventions. The “self” emerges not as a stable entity, but as a field where multiple wills act simultaneously, attempting to define it.</p>
+                    <p>The thread functions as both connection and boundary—binding while constraining. It reveals the blurred threshold between care, control, and belonging, as multiple directions accumulate into entanglement.</p>
+                    <p>This entanglement produces not movement, but stillness: competing “correct” trajectories cancel one another out. Identity becomes difficult to read, its inner axis obscured.</p>
+                    <p>The work questions whether freedom is possible where identity is formed under the gaze of others, and where external definitions end as personal boundaries begin.</p>
+                </div>
+            </section>
 
-    // 4. Initialize Three.js Scene and Load STL
-    function init3D(stlPath) {
-      container.innerHTML = ''; // Clear previous renders
-      loadingText.style.display = 'block';
-      loadingText.innerText = 'Loading 3D Model...';
+            <section id="section-ani" class="section">
+                <div class="hy">
+                    <div class="artist-signature">
+                        <div class="name">Անի Խաչատրյան<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                        <div class="artwork">մարմին</div>
+                    </div>
+                    <p>Մարդը այս աշխարհում ամենաեզակի և արարչական երևույթներից մեկն է։ Մարդկային ոգին ու բնազդը այնպիսի խորություն ունեն, որ ոչինչ չի կարող ամբողջությամբ չափել կամ սահմանել դրանք։ Թե տղամարդը, թե կինը բնության ստեղծագործություններ են՝ երբեմն հանգիստ, երբեմն փոթորկոտ, երբեմն էլ անսահման ուժով լի։ Հենց այստեղից էլ ծնվում է հավասարության գաղափարը՝ այն միտքը, որ բոլոր մարդիկ ունեն նույն արժեքը, նույն իրավունքը՝ անկախ սեռից կամ ընտրությունից։</p>
+                    <p>Մարդու մարմինը նման է անծայրածիր օվկիանոսի՝ միաժամանակ խաղաղ ու ալեկոծ, խոր ու անհասկանալի։</p>
+                    <p>Եվ ֆեմինիստական գաղափարը չի ոգևորում կանանց, կոտրելով տղամարդու կերպարը։ Այլ հավասար նորմերի է վերածում մարդկային հարաբերությունները։</p>
+                </div>
+                <div class="en">
+                    <div class="artist-signature">
+                        <div class="name">Ani Khachatryan<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                        <div class="artwork">Body</div>
+                    </div>
+                    <p>Humans are among the most unique and creative phenomena in this world. The human spirit and instinct possess such depth that nothing can fully measure or define them. Both men and women are creations of nature—sometimes calm, sometimes stormy, and sometimes filled with infinite strength. This is where the idea of equality is born: the thought that all people have the same value, the same rights, regardless of gender or choices.</p>
+                    <p>The human body is like a boundless ocean—simultaneously peaceful and turbulent, deep and incomprehensible.</p>
+                    <p>And the feminist idea does not empower women by breaking down the image of the man. Rather, it transforms human relationships into equal norms.</p>
+                </div>
+            </section>
 
-      // Setup Scene
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x111111); // Dark background
+            <section id="section-nush" class="section">
+                <div class="hy">
+                    <div class="artist-signature">
+                        <div class="name">Նուշ Պետրոսյան<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                        <div class="artwork">Ձայն</div>
+                    </div>
+                    <p>Նույնիսկ եթե ձայն ունես, կարո՞ղ ես իսկապես խոսել։</p>
+                    <p>Ոչ ոք ֆիզիկապես քեզ չի կանգնեցնում, ոչ ոք չի լռեցնում, բայց քննադատվելու վախը բառերը կողպում է կոկորդում։ Սա մի թեմա է, որը ո՛չ կարող ես կուլ տալ, ո՛չ էլ արտաբերել։ Բայց միայն այդ վախի բացակայության դեպքում խոսելը կարող է ավելի անվտանգ թվալ, քան լռությունը։</p>
+                </div>
+                <div class="en">
+                    <div class="artist-signature">
+                        <div class="name">Nush Petrosyan<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                        <div class="artwork">Voice</div>
+                    </div>
+                    <p>Even if you have a voice, can you really speak?</p>
+                    <p>Sure, you can talk. Nobody physically stops you, but the fear of judgement keeps the words locked in your throat. It’s a topic which you can’t swallow but also can’t spit it out. Only without that fear can speaking feel safer than silence.</p>
+                </div>
+            </section>
 
-      // Setup Camera
-      camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-      // Camera position will be set dynamically after model loads
+            <section id="section-greta" class="section">
+                <div class="hy">
+                    <div class="artist-signature">
+                        <div class="name">Գրետա Գրիգորյան<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                        <div class="artwork">Անահիտ</div>
+                    </div>
+                    <p>Այս նախագիծը ուսումնասիրում է տարբեր լինելու հուզական ծանրությունը փոքր քաղաքում, որտեղ անհատականությունը հաճախ դառնում է մեկուսացման պատճառ, ոչ թե ազատության։</p>
+                    <p>Կերպարը ներկայացնում է մի մարդու, ով հրաժարվում է կորցնել իր ինքնությունը՝ նույնիսկ մշտական հասարակական ճնշման պայմաններում։</p>
+                    <p>Այնպիսի վայրում, որտեղ բոլորը ճանաչում են միմյանց, առանձնանալը քեզ դարձնում է օտար, գրեթե՝ այլմոլորակային։ Անծանոթը դառնում է անհարմար մյուսների համար, և այդ անհարմարությունը վերածվում է շշուկների, դատողությունների և քո մասին տարածվող բամբասանքների։</p>
+                    <p>Այս բոլոր խոսքերն ու կարծիքները սկսում են ծանրանալ, կարծես մի բան սեղմում է կոկորդդ։ Դառնում է դժվար ապրել ազատ ու պարզապես լինել այն, ինչ դու ես։</p>
+                    <p>Նախագիծը ցույց է տալիս ընդունված լինելու և յուրահատուկ մնալու միջև պայքարը։ Այն ընդգծում է, թե որքան դժվար, բայց միևնույն ժամանակ կարևոր է մնալ ինքդ քեզ՝ անկախ նրանից, թե ինչ են ասում մյուսները։</p>
+                </div>
+                <div class="en">
+                    <div class="artist-signature">
+                        <div class="name">Greta Grigoryan<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                        <div class="artwork">Anahit</div>
+                    </div>
+                    <p>This project explores the emotional weight of being different in a small city, where individuality often becomes a source of isolation rather than freedom. The character represents a person who refuses to lose their identity, even under constant social pressure.</p>
+                    <p>In a place where everyone knows each other, standing out makes you feel like an outsider, almost like an alien. The unfamiliar becomes uncomfortable for others, and this discomfort turns into whispers, judgment, and gossip behind your back.</p>
+                    <p>All these words and opinions start to feel heavy, like something tightening around your neck. It becomes difficult to live freely and just be yourself. The project shows the struggle between being accepted and staying unique. It highlights how difficult, but important it is to remain yourself, no matter what others say.</p>
+                </div>
+            </section>
 
-      // Setup Renderer
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(container.clientWidth, container.clientHeight);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      container.appendChild(renderer.domElement);
+            <section id="section-shahane" class="section">
+                <div class="hy">
+                    <div class="artist-signature">
+                        <div class="name">Շահանե Հարությունյան<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                        <div class="artwork">միսֆիթ</div>
+                    </div>
+                    <p>Այս աշխատանքը արտացոլում է, թե ինչպես են սոցիալական սպասումները աննկատ ձևավորում և սահմանափակում մարդկանց, հատկապես կանանց՝ սահմանափակելով նրանց ներքին աշխարհի արտահայտումը։</p>
+                    <p>Սիրտը խորհրդանշում է ինքնությունը, հույզերն ու խոցելիությունը, իսկ վանդակը՝ հասարակության, ավանդույթների և դատողության մշտական ճնշումը։</p>
+                </div>
+                <div class="en">
+                    <div class="artist-signature">
+                        <div class="name">Shahane Harutyunyan<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                        <div class="artwork">Misfit</div>
+                    </div>
+                    <p>This piece reflects the way social expectations quietly shape and confine people, especially women, limiting the expression of their inner selves.</p>
+                    <p>The heart symbolizes identity, emotion, and vulnerability, while the cage represents the constant pressure of society, tradition, and judgment.</p>
+                </div>
+            </section>
 
-      // Setup OrbitControls (Interaction)
-      controls = new OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true; // Smooth drag feeling
-      controls.dampingFactor = 0.05;
+            <section id="section-jenny" class="section">
+                <div class="hy">
+                    <div class="artist-signature">
+                        <div class="name">Ջենի Գևորգյան<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                        <div class="artwork">[Անվանում]</div>
+                    </div>
+                    <p>Գուցե դանակի տեղը իրականությունն է, որ ստիպում է փակել աչքերդ։</p>
+                </div>
+                <div class="en">
+                    <div class="artist-signature">
+                        <div class="name">Jenny Gevorgyan<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                        <div class="artwork">[Name]</div>
+                    </div>
+                    <p>Maybe instead of a knife, reality is what forces you to close your eyes.</p>
+                </div>
+            </section>
 
-      // 3. LIGHTING: Enhanced for a metallic look on a dark background
-      // Base lighting lowered so reflections pop
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); 
-      scene.add(ambientLight);
-      
-      // Main strong key light from the top front
-      const mainLight = new THREE.DirectionalLight(0xffffff, 2.5);
-      mainLight.position.set(20, 20, 20); 
-      scene.add(mainLight);
+            <section id="section-yeva" class="section">
+                <div class="hy">
+                    <div class="artist-signature">
+                        <div class="name">Եվա Աբգարյան<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                        <div class="artwork">Faceless</div>
+                    </div>
+                    <p>Արվեստի գործն ինքնին խոսում է իր մասին. այն պատկերում է ինձ նման մի աղջկա, որը ձեռքին երկու դիմակ է պահում. մեկը ժպտում է, մյուսը՝ ավելի մեծ ժպտում, կարծես սրանք միակ դեմքերն են, որոնցից նրան թույլատրվում է ընտրել: Դրանց տակ նրա իրական դեմքն է...</p>
+                </div>
+                <div class="en">
+                    <div class="artist-signature">
+                        <div class="name">Yeva Abgaryan<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                        <div class="artwork">Faceless</div>
+                    </div>
+                    <p>The artwork speaks for itself-it shows a girl, looking like me, holding two masks: one smiling, another smiling even bigger, as if these are the only faces she is allowed to choose from. Beneath them, her real face...</p>
+                </div>
+            </section>
 
-      // Fill light from the opposite side to eliminate harsh dark shadows
-      const fillLight = new THREE.DirectionalLight(0xffffff, 1.0);
-      fillLight.position.set(-20, 0, -20);
-      scene.add(fillLight);
+            <section id="section-emilya" class="section">
+                <div class="hy">
+                    <div class="artist-signature">
+                        <div class="name">Էմիլյա Նիկողոսյան<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                    </div>
+                    <p>Մեր աշխարհի ներսում կան բազմաթիվ այլ աշխարհներ։</p>
+                    <p>Հնարավոր է՝ այլևս ասելու ոչինչ չկա—</p>
+                    <p>բացի նրանից, որ երբեմն դրանք անդրադարձվում են մեզ։</p>
+                </div>
+                <div class="en">
+                    <div class="artist-signature">
+                        <div class="name">Emilya Nikoghosyan<span class="icon-placeholder"></span></div>
+                        <div class="line"></div>
+                    </div>
+                    <p>Inside our world, there are many other worlds.</p>
+                    <p>Maybe nothing more needs to be said—</p>
+                    <p>except that sometimes, they reflect back.</p>
+                </div>
+            </section>
+        </main>
 
-      // Environmental hemisphere light for natural gradients
-      const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
-      hemiLight.position.set(0, 20, 0);
-      scene.add(hemiLight);
+        <footer class="support-section">
+            <!-- Հայերեն տարբերակ -->
+            <div class="hy">
+                <div class="support-title">Աջակցություն և Ռեսուրսներ</div>
+                <div class="support-subtitle">Եթե դուք ենթարկվել եք սեռական բռնության, դուք մենակ չեք։</div>
+                <p class="support-desc">Օգնություն կա։ Լուռ։ Գաղտնի։ Առանց դատապարտելու։</p>
+                
+                <div class="support-grid">
+                    <div class="support-col">
+                        <h3>Զանգահարեք</h3>
+                        <div class="support-table">
+                            <div class="fw-bold">102</div>
+                            <div>Ոստիկանություն</div>
+                            
+                            <div class="fw-bold">103</div>
+                            <div>Շտապօգնություն</div>
+                            
+                            <div class="fw-bold">+374 93 568 080</div>
+                            <div>Կանանց աջակցման կենտրոն (24/7)</div>
+                            
+                            <div class="fw-bold">+374 77 991 280</div>
+                            <div>Սեռական բռնության ճգնաժամային կենտրոն</div>
+                        </div>
+                    </div>
+                    <div class="support-col">
+                        <h3>Դիմեք</h3>
+                        <div class="support-table">
+                            <div class="full-width"><a href="https://saccarmenia.org/en_us/%D5%B4%D5%A5%D6%80-%D5%B4%D5%A1%D5%BD%D5%AB%D5%B6/" target="_blank">Սեռական բռնության ճգնաժամային կենտրոն</a></div>
+                            <div class="full-width"><a href="https://womenfundarmenia.org/" target="_blank">Կանանց Հիմնադրամ Հայաստան</a></div>
+                            <div class="full-width"><a href="https://womensrightshouse.org/about-us/" target="_blank">Կանանց իրավունքների տուն</a></div>
+                            <div class="full-width"><a href="https://womenofarmenia.org/" target="_blank">Կանանց ռեսուրսային կենտրոն</a></div>
+                            <div class="fw-bold"><a href="https://safeyou.space/en" target="_blank">Safe YOU</a></div>
+                            <div>բջջային աջակցության ցանց</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-      // Setup STLLoader
-      const loader = new STLLoader();
-      
-      try {
-        loader.load(
-          stlPath, 
-          function (geometry) {
-            loadingText.style.display = 'none';
+            <!-- Անգլերեն տարբերակ -->
+            <div class="en">
+                <div class="support-title">Support & Resources</div>
+                <div class="support-subtitle">If you have experienced sexual violence, you are not alone.</div>
+                <p class="support-desc">Help exists. Quietly. Confidentially. Without judgment.</p>
+                
+                <div class="support-grid">
+                    <div class="support-col">
+                        <h3>Call</h3>
+                        <div class="support-table">
+                            <div class="fw-bold">102</div>
+                            <div>Police</div>
+                            
+                            <div class="fw-bold">103</div>
+                            <div>Ambulance</div>
+                            
+                            <div class="fw-bold">+374 93 568 080</div>
+                            <div>Women’s Support Center (24/7)</div>
+                            
+                            <div class="fw-bold">+374 77 991 280</div>
+                            <div>Sexual Assault Crisis Center</div>
+                        </div>
+                    </div>
+                    <div class="support-col">
+                        <h3>Reach</h3>
+                        <div class="support-table">
+                            <div class="full-width"><a href="https://saccarmenia.org/en_us/" target="_blank">Sexual Assault Crisis Center</a></div>
+                            <div class="full-width"><a href="https://womenfundarmenia.org/" target="_blank">Women's Fund Armenia</a></div>
+                            <div class="full-width"><a href="https://womensrightshouse.org/about-us/" target="_blank">Women's Rights House</a></div>
+                            <div class="full-width"><a href="https://womenofarmenia.org/" target="_blank">Women's Resource Center</a></div>
+                            <div class="fw-bold"><a href="https://safeyou.space/en" target="_blank">Safe YOU</a></div>
+                            <div>mobile support network</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
 
-            // Compute vertex normals to ensure light reflects correctly off the geometry
-            geometry.computeVertexNormals();
+    </div>
 
-            // 4. MATERIAL: Bright white metallic material
-            const material = new THREE.MeshStandardMaterial({ 
-              color: 0xffffff,   // Pure white
-              roughness: 0.4,    // Lowered for a more polished/metallic surface
-              metalness: 0.5,    // Increased for a metallic sheen
-              side: THREE.DoubleSide // Important: renders both sides if 3D normals are flipped
-            });
-            
-            const mesh = new THREE.Mesh(geometry, material);
+    <!-- 3D Modal Structure -->
+    <div id="stl-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" id="close-modal" aria-label="Close modal">&times;</button>
+            <div id="modal-loading-text">Loading 3D Model...</div>
+            <div id="modal-canvas-container"></div>
+        </div>
+    </div>
 
-            // FIX: ROTATION
-            // Standard STL exports usually have Z pointing up. We rotate it -90 degrees on X to stand upright in Three.js (Y-up).
-            mesh.rotation.x = -Math.PI / 2;
-            mesh.updateMatrixWorld();
-
-            // 1. CENTERING & SCALING:
-            // Calculate bounding box AFTER rotating it upright
-            let box = new THREE.Box3().setFromObject(mesh);
-            let size = box.getSize(new THREE.Vector3());
-            
-            const maxDim = Math.max(size.x, size.y, size.z);
-            const targetSize = 50; 
-            const scale = targetSize / maxDim;
-            mesh.scale.setScalar(scale);
-
-            // Update mesh matrix so the Box3 calculation uses the newly applied scale
-            mesh.updateMatrixWorld();
-
-            // Recalculate bounding box AFTER scaling to get the accurate scaled center
-            box.setFromObject(mesh);
-            const center = box.getCenter(new THREE.Vector3());
-            
-            // Reposition mesh perfectly to the center
-            mesh.position.sub(center);
-
-            // Add to a pivot group. The mesh is off-center locally, but centered visually.
-            // Rotating the pivot rotates the perfectly centered mesh.
-            const pivot = new THREE.Group();
-            scene.add(pivot);
-            pivot.add(mesh);
-            currentModel = pivot; 
-
-            // 2. CAMERA: Position based on the bounded target size so the whole model fits
-            const fov = camera.fov * (Math.PI / 180);
-            const cameraDistance = targetSize / (2 * Math.tan(fov / 2)) * 1.5; // 1.5 multiplier adds padding around model
-            
-            camera.position.set(0, 0, cameraDistance);
-            camera.lookAt(0, 0, 0);
-            controls.update();
-
-            animate(); // Start render loop
-          },
-          function (xhr) {
-            // Progress bar behavior
-            if (xhr.total > 0) {
-              const percent = Math.round((xhr.loaded / xhr.total) * 100);
-              loadingText.innerText = `Loading: ${percent}%`;
+    <script>
+        function toggleLanguage() {
+            const body = document.body;
+            if (body.classList.contains('lang-hy')) {
+                body.classList.remove('lang-hy');
+                body.classList.add('lang-en');
+                document.documentElement.lang = "en";
+            } else {
+                body.classList.remove('lang-en');
+                body.classList.add('lang-hy');
+                document.documentElement.lang = "hy";
             }
-          },
-          function (error) {
-            console.error("Error loading STL:", error);
-            loadingText.innerText = "Error loading 3D model. File not found or invalid URL.";
-          }
-        );
-      } catch (err) {
-        console.error("Path error:", err);
-        loadingText.innerText = "Error: Invalid path for STL file.";
-      }
+        }
 
-      // Handle window resizing dynamically
-      window.addEventListener('resize', onWindowResize, false);
-    }
+        // Scroll Reveal Animation Logic
+        document.addEventListener("DOMContentLoaded", () => {
+            // Setup the icons
+            const template = document.getElementById('icon-3d-template');
+            document.querySelectorAll('.icon-placeholder').forEach(placeholder => {
+                placeholder.appendChild(template.content.cloneNode(true));
+            });
 
-    function onWindowResize() {
-      if (!camera || !renderer) return;
-      camera.aspect = container.clientWidth / container.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
-    }
+            // Select all the sections we want to animate
+            const revealElements = document.querySelectorAll('.section, .exhibition-title, .support-section');
+            
+            // Add the base animation class to them initially
+            revealElements.forEach(el => el.classList.add('reveal-on-scroll'));
 
-    // 5. Animation Loop
-    function animate() {
-      reqId = requestAnimationFrame(animate);
-      
-      // Implement the slow automatic rotation
-      if (currentModel) {
-        currentModel.rotation.y += 0.003; 
-      }
-      
-      controls.update();
-      renderer.render(scene, camera);
-    }
-  </script>
+            // Setup the observer to trigger when elements enter the screen
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target); // Only animate once
+                    }
+                });
+            }, {
+                root: null,
+                threshold: 0.15, // Trigger when 15% of the element is visible
+                rootMargin: "0px 0px -50px 0px" // Trigger slightly before the bottom of the screen
+            });
+
+            // Start observing
+            revealElements.forEach(el => observer.observe(el));
+        });
+    </script>
+
+    <!-- Unified Three.js Script -->
+    <script type="module">
+        import * as THREE from 'three';
+        import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import * as CANNON from 'cannon-es';
+
+        // Base URL for Github models to work in sandbox
+        const baseUrl = 'https://raw.githubusercontent.com/emilyanikoghosyan/azd/42f2d926f553353fe9b3dfdfb81d3c2a40918c69/';
+
+        // =======================================================================
+        // PART 1: 3D PHYSICS HERO ENTRANCE
+        // =======================================================================
+        const modelsData = [
+            { id: 'Ani', path: baseUrl + 'models/ani.stl', targetId: 'section-ani' },
+            { id: 'Emilya', path: baseUrl + 'models/emilya.stl', targetId: 'section-emilya' },
+            { id: 'Greta', path: baseUrl + 'models/greta.stl', targetId: 'section-greta' },
+            { id: 'Jenny', path: baseUrl + 'models/jenny.stl', targetId: 'section-jenny' },
+            { id: 'Nush', path: baseUrl + 'models/nush.stl', targetId: 'section-nush' },
+            { id: 'Shahane', path: baseUrl + 'models/shahane.stl', targetId: 'section-shahane' },
+            { id: 'Suzy', path: baseUrl + 'models/suzy.stl', targetId: 'section-suzy' },
+            { id: 'Yeva', path: baseUrl + 'models/yeva.stl', targetId: 'section-yeva' }
+        ];
+
+        const container = document.getElementById('canvas-container');
+        
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0d0d0d, 0.008);
+
+        const isMobile = window.innerWidth < 768;
+        const camera = new THREE.PerspectiveCamera(isMobile ? 60 : 45, window.innerWidth / window.innerHeight, 0.1, 500);
+        // Pulled camera back slightly to accommodate larger models
+        camera.position.set(0, isMobile ? 20 : 10, isMobile ? 120 : 100);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+
+        const spotLight = new THREE.SpotLight(0xffffff, 250);
+        spotLight.position.set(20, 50, 30);
+        spotLight.angle = Math.PI / 3;
+        spotLight.penumbra = 0.8;
+        scene.add(spotLight);
+
+        const fillLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        fillLight.position.set(-20, 10, 20);
+        scene.add(fillLight);
+
+        const world = new CANNON.World();
+        world.gravity.set(0, -40, 0);
+        world.broadphase = new CANNON.SAPBroadphase(world);
+        
+        const defaultMaterial = new CANNON.Material('default');
+        const defaultContactMaterial = new CANNON.ContactMaterial(defaultMaterial, defaultMaterial, {
+            friction: 0.1,
+            restitution: 0.3,
+        });
+        world.addContactMaterial(defaultContactMaterial);
+
+        const floorShape = new CANNON.Plane();
+        const floorBody = new CANNON.Body({ mass: 0, shape: floorShape, material: defaultMaterial });
+        floorBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+        floorBody.position.y = -20;
+        world.addBody(floorBody);
+
+        const wallShape = new CANNON.Plane();
+        const sideWallDist = isMobile ? 22 : 45; // widened the walls a bit for larger models
+        const wallOffsets = [
+            { pos: [0, 0, -20], rot: [0, 0, 0] },
+            { pos: [0, 0, 30], rot: [0, Math.PI, 0] },
+            { pos: [-sideWallDist, 0, 0], rot: [0, Math.PI / 2, 0] },
+            { pos: [sideWallDist, 0, 0], rot: [0, -Math.PI / 2, 0] }
+        ];
+        wallOffsets.forEach(w => {
+            const wallBody = new CANNON.Body({ mass: 0, shape: wallShape, material: defaultMaterial });
+            wallBody.position.set(...w.pos);
+            wallBody.quaternion.setFromEuler(...w.rot);
+            world.addBody(wallBody);
+        });
+
+        const loadingManager = new THREE.LoadingManager();
+        const stlLoader = new STLLoader(loadingManager);
+        
+        const baseMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0xffffff,
+            metalness: 0.05,
+            roughness: 0.3,
+            clearcoat: 0.5,
+            clearcoatRoughness: 0.2
+        });
+
+        const interactiveObjects = [];
+        const numCopies = 10; 
+
+        loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
+            document.getElementById('progress-text').innerText = Math.round((itemsLoaded / itemsTotal) * 100) + '%';
+        };
+
+        loadingManager.onLoad = () => {
+            const loadingScreen = document.getElementById('loading-screen');
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => loadingScreen.remove(), 1000);
+        };
+
+        modelsData.forEach((data) => {
+            stlLoader.load(data.path, (geometry) => {
+                geometry.computeBoundingBox();
+                geometry.computeBoundingSphere();
+                geometry.center();
+
+                const meshSize = geometry.boundingSphere.radius;
+                
+                // --- INCREASED MODEL SIZE HERE ---
+                const targetSize = 8; // Previously 3. This makes them much larger.
+                const scaleFactor = targetSize / meshSize;
+
+                for (let i = 0; i < numCopies; i++) {
+                    const material = baseMaterial.clone();
+                    const mesh = new THREE.Mesh(geometry, material);
+                    
+                    // Adjusted scale variance slightly to account for the larger base size
+                    const randomScale = scaleFactor * (0.7 + Math.random() * 0.5); 
+                    mesh.scale.set(randomScale, randomScale, randomScale);
+                    
+                    const radius = targetSize * (randomScale / scaleFactor); 
+                    const body = new CANNON.Body({
+                        mass: 5,
+                        shape: new CANNON.Sphere(radius * 0.9),
+                        material: defaultMaterial,
+                        linearDamping: 0.1,
+                        angularDamping: 0.1
+                    });
+
+                    // Spread them out higher and wider when falling so they don't clip instantly
+                    body.position.set((Math.random() - 0.5) * 80, 50 + Math.random() * 150, (Math.random() - 0.5) * 20);
+                    
+                    // Fix initial rotation to upright (-90 degrees on X) instead of random tumbling
+                    body.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+                    
+                    world.addBody(body);
+                    scene.add(mesh);
+                    
+                    mesh.userData = {
+                        id: data.id,
+                        targetId: data.targetId,
+                        body: body,
+                        baseColor: new THREE.Color(0xffffff),
+                        hoverColor: new THREE.Color(0xdddddd),
+                        isHovered: false
+                    };
+                    interactiveObjects.push(mesh);
+                }
+            });
+        });
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let hoveredObject = null;
+
+        const dragPlane = new THREE.Plane();
+        let activeConstraint = null;
+        let draggedMesh = null;
+        const mouseConstraintBody = new CANNON.Body({ type: CANNON.Body.KINEMATIC });
+        world.addBody(mouseConstraintBody);
+        let clickStartPosition = { x: 0, y: 0 };
+
+        function updatePointer(clientX, clientY) {
+            const rect = container.getBoundingClientRect();
+            mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+        }
+
+        function onPointerMove(clientX, clientY) {
+            updatePointer(clientX, clientY);
+
+            if (activeConstraint && draggedMesh) {
+                raycaster.setFromCamera(mouse, camera);
+                const intersection = new THREE.Vector3();
+                raycaster.ray.intersectPlane(dragPlane, intersection);
+                mouseConstraintBody.position.copy(intersection);
+            }
+        }
+
+        container.addEventListener('mousemove', (e) => onPointerMove(e.clientX, e.clientY));
+        container.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: false });
+
+        function onPointerDown(clientX, clientY) {
+            clickStartPosition = { x: clientX, y: clientY };
+            updatePointer(clientX, clientY);
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(interactiveObjects);
+
+            if (intersects.length > 0) {
+                draggedMesh = intersects[0].object;
+                const hitPoint = intersects[0].point;
+                const body = draggedMesh.userData.body;
+
+                dragPlane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()), hitPoint);
+                mouseConstraintBody.position.copy(hitPoint);
+
+                const localPivot = new CANNON.Vec3();
+                body.pointToLocalFrame(new CANNON.Vec3(hitPoint.x, hitPoint.y, hitPoint.z), localPivot);
+                
+                activeConstraint = new CANNON.PointToPointConstraint(body, localPivot, mouseConstraintBody, new CANNON.Vec3(0,0,0), 1e6);
+                world.addConstraint(activeConstraint);
+                body.wakeUp();
+                
+                container.classList.add('pointer-active');
+            }
+        }
+
+        container.addEventListener('mousedown', (e) => onPointerDown(e.clientX, e.clientY));
+        container.addEventListener('touchstart', (e) => onPointerDown(e.touches[0].clientX, e.touches[0].clientY), { passive: false });
+
+        function onPointerUp(clientX, clientY) {
+            if (activeConstraint) {
+                world.removeConstraint(activeConstraint);
+                activeConstraint = null;
+                container.classList.remove('pointer-active');
+            }
+
+            const dist = Math.hypot(clientX - clickStartPosition.x, clientY - clickStartPosition.y);
+            if (dist < 10 && draggedMesh && draggedMesh.userData.targetId) { 
+                const section = document.getElementById(draggedMesh.userData.targetId);
+                if (section) {
+                    section.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+            draggedMesh = null;
+        }
+
+        container.addEventListener('mouseup', (e) => onPointerUp(e.clientX, e.clientY));
+        container.addEventListener('touchend', (e) => {
+            const touch = e.changedTouches[0];
+            onPointerUp(touch.clientX, touch.clientY);
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        const clock = new THREE.Clock();
+        const timeStep = 1 / 60;
+
+        function animatePhysics() {
+            requestAnimationFrame(animatePhysics);
+            
+            if (window.scrollY > window.innerHeight) return; 
+
+            const dt = clock.getDelta();
+            world.step(timeStep, dt, 3);
+
+            if (!activeConstraint) {
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(interactiveObjects);
+
+                if (hoveredObject) hoveredObject.userData.isHovered = false;
+
+                if (intersects.length > 0) {
+                    hoveredObject = intersects[0].object;
+                    hoveredObject.userData.isHovered = true;
+                    container.classList.add('pointer-active');
+                } else {
+                    hoveredObject = null;
+                    container.classList.remove('pointer-active');
+                }
+            }
+
+            interactiveObjects.forEach(mesh => {
+                const data = mesh.userData;
+                const body = data.body;
+                
+                mesh.position.copy(body.position);
+                mesh.quaternion.copy(body.quaternion);
+
+                if (data.isHovered || mesh === draggedMesh) {
+                    mesh.material.color.lerp(data.hoverColor, 0.1);
+                    mesh.material.emissive.lerp(new THREE.Color(0x222222), 0.1);
+                } else {
+                    mesh.material.color.lerp(data.baseColor, 0.1);
+                    mesh.material.emissive.lerp(new THREE.Color(0x000000), 0.1);
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+        animatePhysics();
+
+
+        // =======================================================================
+        // PART 2: 3D MODAL VIEWER (Inside Exhibition Content)
+        // =======================================================================
+        const artistModels = {
+            "Սյուզի Գինոսյան": baseUrl + "models/suzy.stl",
+            "Suzy Ginosyan": baseUrl + "models/suzy.stl",
+            "Անի Խաչատրյան": baseUrl + "models/ani.stl",
+            "Ani Khachatryan": baseUrl + "models/ani.stl",
+            "Նուշ Պետրոսյան": baseUrl + "models/nush.stl",
+            "Nush Petrosyan": baseUrl + "models/nush.stl",
+            "Գրետա Գրիգորյան": baseUrl + "models/greta.stl",
+            "Greta Grigoryan": baseUrl + "models/greta.stl",
+            "Շահանե Հարությունյան": baseUrl + "models/shahane.stl",
+            "Shahane Harutyunyan": baseUrl + "models/shahane.stl",
+            "Ջենի Գևորգյան": baseUrl + "models/jenny.stl",
+            "Jenny Gevorgyan": baseUrl + "models/jenny.stl",
+            "Եվա Աբգարյան": baseUrl + "models/yeva.stl",
+            "Yeva Abgaryan": baseUrl + "models/yeva.stl",
+            "Էմիլյա Նիկողոսյան": baseUrl + "models/emilya.stl",
+            "Emilya Nikoghosyan": baseUrl + "models/emilya.stl"
+        };
+
+        // Attach click listeners to the artist names
+        document.querySelectorAll('.name').forEach(nameEl => {
+            nameEl.title = "Click to view 3D artwork";
+            nameEl.addEventListener('click', () => {
+                const artistName = nameEl.textContent.replace('⟲ 3D', '').trim();
+                const stlPath = artistModels[artistName];
+                if (stlPath) openModal(stlPath);
+            });
+        });
+
+        let mScene, mCamera, mRenderer, mControls, mCurrentModel, mReqId;
+        const modal = document.getElementById('stl-modal');
+        const mContainer = document.getElementById('modal-canvas-container');
+        const closeBtn = document.getElementById('close-modal');
+        const mLoadingText = document.getElementById('modal-loading-text');
+
+        function openModal(stlPath) {
+            modal.style.display = 'flex';
+            initModal3D(stlPath);
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            if (mReqId) cancelAnimationFrame(mReqId);
+            if (mRenderer) {
+                mContainer.removeChild(mRenderer.domElement);
+                mRenderer.dispose();
+            }
+            mCurrentModel = null;
+            mScene = null;
+        }
+
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        function initModal3D(stlPath) {
+            mContainer.innerHTML = ''; 
+            mLoadingText.style.display = 'block';
+            mLoadingText.innerText = 'Loading 3D Model...';
+
+            mScene = new THREE.Scene();
+            mScene.background = new THREE.Color(0x111111);
+
+            mCamera = new THREE.PerspectiveCamera(45, mContainer.clientWidth / mContainer.clientHeight, 0.1, 1000);
+
+            mRenderer = new THREE.WebGLRenderer({ antialias: true });
+            mRenderer.setSize(mContainer.clientWidth, mContainer.clientHeight);
+            mRenderer.setPixelRatio(window.devicePixelRatio);
+            mContainer.appendChild(mRenderer.domElement);
+
+            mControls = new OrbitControls(mCamera, mRenderer.domElement);
+            mControls.enableDamping = true; 
+            mControls.dampingFactor = 0.05;
+
+            const mAmbient = new THREE.AmbientLight(0xffffff, 0.6); 
+            mScene.add(mAmbient);
+            
+            const mMainLight = new THREE.DirectionalLight(0xffffff, 2.5);
+            mMainLight.position.set(20, 20, 20); 
+            mScene.add(mMainLight);
+
+            const mFillLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            mFillLight.position.set(-20, 0, -20);
+            mScene.add(mFillLight);
+
+            const mHemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
+            mHemiLight.position.set(0, 20, 0);
+            mScene.add(mHemiLight);
+
+            const mLoader = new STLLoader();
+            
+            try {
+                mLoader.load(
+                    stlPath, 
+                    function (geometry) {
+                        mLoadingText.style.display = 'none';
+                        geometry.computeVertexNormals();
+
+                        const material = new THREE.MeshStandardMaterial({ 
+                            color: 0xffffff,
+                            roughness: 0.4,
+                            metalness: 0.5,
+                            side: THREE.DoubleSide
+                        });
+                        
+                        const mesh = new THREE.Mesh(geometry, material);
+                        mesh.rotation.x = -Math.PI / 2;
+                        mesh.updateMatrixWorld();
+
+                        let box = new THREE.Box3().setFromObject(mesh);
+                        let size = box.getSize(new THREE.Vector3());
+                        
+                        const maxDim = Math.max(size.x, size.y, size.z);
+                        const targetSize = 50; 
+                        const scale = targetSize / maxDim;
+                        mesh.scale.setScalar(scale);
+
+                        mesh.updateMatrixWorld();
+                        box.setFromObject(mesh);
+                        const center = box.getCenter(new THREE.Vector3());
+                        
+                        mesh.position.sub(center);
+
+                        const pivot = new THREE.Group();
+                        mScene.add(pivot);
+                        pivot.add(mesh);
+                        mCurrentModel = pivot; 
+
+                        const fov = mCamera.fov * (Math.PI / 180);
+                        const cameraDistance = targetSize / (2 * Math.tan(fov / 2)) * 1.5; 
+                        
+                        mCamera.position.set(0, 0, cameraDistance);
+                        mCamera.lookAt(0, 0, 0);
+                        mControls.update();
+
+                        animateModal(); 
+                    },
+                    function (xhr) {
+                        if (xhr.total > 0) {
+                            const percent = Math.round((xhr.loaded / xhr.total) * 100);
+                            mLoadingText.innerText = `Loading: ${percent}%`;
+                        }
+                    },
+                    function (error) {
+                        mLoadingText.innerText = "Error loading 3D model. File not found or invalid URL.";
+                    }
+                );
+            } catch (err) {
+                mLoadingText.innerText = "Error: Invalid path for STL file.";
+            }
+
+            window.addEventListener('resize', onModalResize, false);
+        }
+
+        function onModalResize() {
+            if (!mCamera || !mRenderer || modal.style.display === 'none') return;
+            mCamera.aspect = mContainer.clientWidth / mContainer.clientHeight;
+            mCamera.updateProjectionMatrix();
+            mRenderer.setSize(mContainer.clientWidth, mContainer.clientHeight);
+        }
+
+        function animateModal() {
+            mReqId = requestAnimationFrame(animateModal);
+            if (mCurrentModel) mCurrentModel.rotation.y += 0.003; 
+            mControls.update();
+            mRenderer.render(mScene, mCamera);
+        }
+    </script>
 </body>
 </html>
