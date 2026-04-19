@@ -96,6 +96,33 @@
             animation: bounce 2s infinite;
         }
 
+        .awareness-banner {
+            background-color: #ffffff;
+            border-left: 4px solid #ff3b30;
+            padding: 16px 20px;
+            margin-bottom: 30px;
+            font-size: 14px;
+            color: #444;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .awareness-banner strong {
+            color: #111;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .awareness-banner p {
+            margin: 0 0 8px 0;
+            line-height: 1.5;
+        }
+
+        .awareness-banner p:last-child {
+            margin-bottom: 0;
+        }
+
         #loading-screen {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -221,14 +248,6 @@
             font-size: 18px;
             font-weight: 700;
             color: #111;
-            display: inline-flex;
-            align-items: center;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-        
-        .artist-signature .name:hover {
-            color: #666;
         }
 
         .artist-signature .line {
@@ -244,6 +263,14 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #666;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .artist-signature .artwork:hover {
+            color: #111;
         }
 
         .artist-signature .location {
@@ -263,16 +290,18 @@
 
         /* Icon styling */
         .icon-3d {
+            display: inline-block;
             margin-left: 10px;
-            width: 24px;
-            height: 24px;
+            width: 8px;
+            height: 8px;
+            background-color: #ff3b30;
+            border-radius: 50%;
             flex-shrink: 0;
-            opacity: 0.8;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .artist-signature .name:hover .icon-3d {
-            transform: scale(1.1);
-            opacity: 1;
+        .artist-signature .artwork:hover .icon-3d {
+            transform: scale(1.5);
+            box-shadow: 0 0 6px rgba(255, 59, 48, 0.6);
         }
 
         /* Support Section */
@@ -441,6 +470,12 @@
     =========================================== -->
     <section id="hero-section">
         <!-- Text overlay removed to focus entirely on the chaotic 3D models -->
+        <div id="ui-layer">
+            <div class="scroll-indicator">
+                <span class="hy">scroll down ↓</span>
+                <span class="en">scroll down ↓</span>
+            </div>
+        </div>
         <div id="canvas-container"></div>
     </section>
 
@@ -480,25 +515,18 @@
             </section>
 
             <!-- 
-                Reusable SVG for the 3D Icon based on user request (Cube in circle)
+                Reusable Element for the 3D Icon (Red dot)
             -->
             <template id="icon-3d-template">
-                <svg class="icon-3d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="m7.5 8 4.5 2.5L16.5 8"></path>
-                    <path d="M12 10.5V16"></path>
-                    <path d="m7.5 13.5 4.5 2.5 4.5-2.5"></path>
-                    <path d="M7.5 8v5.5"></path>
-                    <path d="M16.5 8v5.5"></path>
-                </svg>
+                <span class="icon-3d"></span>
             </template>
 
             <section id="section-suzy" class="section">
                 <div class="hy">
                     <div class="artist-signature">
-                        <div class="name">Սյուզի Գինոսյան<span class="icon-placeholder"></span></div>
+                        <div class="name">Սյուզի Գինոսյան</div>
                         <div class="line"></div>
-                        <div class="artwork">կապ</div>
+                        <div class="artwork">կապ<span class="icon-placeholder"></span></div>
                         <a href="https://www.google.com/maps/place/Central+Park/@40.7850871,43.8328931,17z/data=!3m1!4b1!4m6!3m5!1s0x4041fc754e297085:0x9e8d0bd8b05d3d5d!8m2!3d40.7850871!4d43.835468!16s%2Fg%2F1td0d_2j?entry=ttu&g_ep=EgoyMDI2MDMyNC4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="location">📍 location</a>
                     </div>
                     <p>Անհատը ինքնաբավ չէ․ այն մշտապես ձևավորվում է արտաքին հայացքների և միջամտությունների ներսում։ «Ես»-ը կայուն չէ, այլ դաշտ է, որի վրա միաժամանակ ներգործում են տարբեր կամքեր՝ փորձելով այն ձևավորել իրենց պատկերացմամբ։</p>
@@ -508,9 +536,9 @@
                 </div>
                 <div class="en">
                     <div class="artist-signature">
-                        <div class="name">Suzy Ginosyan<span class="icon-placeholder"></span></div>
+                        <div class="name">Suzy Ginosyan</div>
                         <div class="line"></div>
-                        <div class="artwork">bond</div>
+                        <div class="artwork">bond<span class="icon-placeholder"></span></div>
                         <a href="https://www.google.com/maps/place/Central+Park/@40.7850871,43.8328931,17z/data=!3m1!4b1!4m6!3m5!1s0x4041fc754e297085:0x9e8d0bd8b05d3d5d!8m2!3d40.7850871!4d43.835468!16s%2Fg%2F1td0d_2j?entry=ttu&g_ep=EgoyMDI2MDMyNC4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="location">📍 location</a>
                     </div>
                     <p>The individual is not self-contained, but continuously shaped through external gazes and interventions. The “self” emerges not as a stable entity, but as a field where multiple wills act simultaneously, attempting to define it.</p>
@@ -523,9 +551,9 @@
             <section id="section-ani" class="section">
                 <div class="hy">
                     <div class="artist-signature">
-                        <div class="name">Անի Խաչատրյան<span class="icon-placeholder"></span></div>
+                        <div class="name">Անի Խաչատրյան</div>
                         <div class="line"></div>
-                        <div class="artwork">մարմին</div>
+                        <div class="artwork">մարմին<span class="icon-placeholder"></span></div>
                     </div>
                     <p>Մարդը այս աշխարհում ամենաեզակի և արարչական երևույթներից մեկն է։ Մարդկային ոգին ու բնազդը այնպիսի խորություն ունեն, որ ոչինչ չի կարող ամբողջությամբ չափել կամ սահմանել դրանք։ Թե տղամարդը, թե կինը բնության ստեղծագործություններ են՝ երբեմն հանգիստ, երբեմն փոթորկոտ, երբեմն էլ անսահման ուժով լի։ Հենց այստեղից էլ ծնվում է հավասարության գաղափարը՝ այն միտքը, որ բոլոր մարդիկ ունեն նույն արժեքը, նույն իրավունքը՝ անկախ սեռից կամ ընտրությունից։</p>
                     <p>Մարդու մարմինը նման է անծայրածիր օվկիանոսի՝ միաժամանակ խաղաղ ու ալեկոծ, խոր ու անհասկանալի։</p>
@@ -533,9 +561,9 @@
                 </div>
                 <div class="en">
                     <div class="artist-signature">
-                        <div class="name">Ani Khachatryan<span class="icon-placeholder"></span></div>
+                        <div class="name">Ani Khachatryan</div>
                         <div class="line"></div>
-                        <div class="artwork">Body</div>
+                        <div class="artwork">Body<span class="icon-placeholder"></span></div>
                     </div>
                     <p>Humans are among the most unique and creative phenomena in this world. The human spirit and instinct possess such depth that nothing can fully measure or define them. Both men and women are creations of nature—sometimes calm, sometimes stormy, and sometimes filled with infinite strength. This is where the idea of equality is born: the thought that all people have the same value, the same rights, regardless of gender or choices.</p>
                     <p>The human body is like a boundless ocean—simultaneously peaceful and turbulent, deep and incomprehensible.</p>
@@ -546,18 +574,18 @@
             <section id="section-nush" class="section">
                 <div class="hy">
                     <div class="artist-signature">
-                        <div class="name">Նուշ Պետրոսյան<span class="icon-placeholder"></span></div>
+                        <div class="name">Նուշ Պետրոսյան</div>
                         <div class="line"></div>
-                        <div class="artwork">Ձայն</div>
+                        <div class="artwork">Ձայն<span class="icon-placeholder"></span></div>
                     </div>
                     <p>Նույնիսկ եթե ձայն ունես, կարո՞ղ ես իսկապես խոսել։</p>
                     <p>Ոչ ոք ֆիզիկապես քեզ չի կանգնեցնում, ոչ ոք չի լռեցնում, բայց քննադատվելու վախը բառերը կողպում է կոկորդում։ Սա մի թեմա է, որը ո՛չ կարող ես կուլ տալ, ո՛չ էլ արտաբերել։ Բայց միայն այդ վախի բացակայության դեպքում խոսելը կարող է ավելի անվտանգ թվալ, քան լռությունը։</p>
                 </div>
                 <div class="en">
                     <div class="artist-signature">
-                        <div class="name">Nush Petrosyan<span class="icon-placeholder"></span></div>
+                        <div class="name">Nush Petrosyan</div>
                         <div class="line"></div>
-                        <div class="artwork">Voice</div>
+                        <div class="artwork">Voice<span class="icon-placeholder"></span></div>
                     </div>
                     <p>Even if you have a voice, can you really speak?</p>
                     <p>Sure, you can talk. Nobody physically stops you, but the fear of judgement keeps the words locked in your throat. It’s a topic which you can’t swallow but also can’t spit it out. Only without that fear can speaking feel safer than silence.</p>
@@ -567,9 +595,9 @@
             <section id="section-greta" class="section">
                 <div class="hy">
                     <div class="artist-signature">
-                        <div class="name">Գրետա Գրիգորյան<span class="icon-placeholder"></span></div>
+                        <div class="name">Գրետա Գրիգորյան</div>
                         <div class="line"></div>
-                        <div class="artwork">Անահիտ</div>
+                        <div class="artwork">Անահիտ<span class="icon-placeholder"></span></div>
                     </div>
                     <p>Այս նախագիծը ուսումնասիրում է տարբեր լինելու հուզական ծանրությունը փոքր քաղաքում, որտեղ անհատականությունը հաճախ դառնում է մեկուսացման պատճառ, ոչ թե ազատության։</p>
                     <p>Կերպարը ներկայացնում է մի մարդու, ով հրաժարվում է կորցնել իր ինքնությունը՝ նույնիսկ մշտական հասարակական ճնշման պայմաններում։</p>
@@ -579,9 +607,9 @@
                 </div>
                 <div class="en">
                     <div class="artist-signature">
-                        <div class="name">Greta Grigoryan<span class="icon-placeholder"></span></div>
+                        <div class="name">Greta Grigoryan</div>
                         <div class="line"></div>
-                        <div class="artwork">Anahit</div>
+                        <div class="artwork">Anahit<span class="icon-placeholder"></span></div>
                     </div>
                     <p>This project explores the emotional weight of being different in a small city, where individuality often becomes a source of isolation rather than freedom. The character represents a person who refuses to lose their identity, even under constant social pressure.</p>
                     <p>In a place where everyone knows each other, standing out makes you feel like an outsider, almost like an alien. The unfamiliar becomes uncomfortable for others, and this discomfort turns into whispers, judgment, and gossip behind your back.</p>
@@ -592,18 +620,18 @@
             <section id="section-shahane" class="section">
                 <div class="hy">
                     <div class="artist-signature">
-                        <div class="name">Շահանե Հարությունյան<span class="icon-placeholder"></span></div>
+                        <div class="name">Շահանե Հարությունյան</div>
                         <div class="line"></div>
-                        <div class="artwork">միսֆիթ</div>
+                        <div class="artwork">միսֆիթ<span class="icon-placeholder"></span></div>
                     </div>
                     <p>Այս աշխատանքը արտացոլում է, թե ինչպես են սոցիալական սպասումները աննկատ ձևավորում և սահմանափակում մարդկանց, հատկապես կանանց՝ սահմանափակելով նրանց ներքին աշխարհի արտահայտումը։</p>
                     <p>Սիրտը խորհրդանշում է ինքնությունը, հույզերն ու խոցելիությունը, իսկ վանդակը՝ հասարակության, ավանդույթների և դատողության մշտական ճնշումը։</p>
                 </div>
                 <div class="en">
                     <div class="artist-signature">
-                        <div class="name">Shahane Harutyunyan<span class="icon-placeholder"></span></div>
+                        <div class="name">Shahane Harutyunyan</div>
                         <div class="line"></div>
-                        <div class="artwork">Misfit</div>
+                        <div class="artwork">Misfit<span class="icon-placeholder"></span></div>
                     </div>
                     <p>This piece reflects the way social expectations quietly shape and confine people, especially women, limiting the expression of their inner selves.</p>
                     <p>The heart symbolizes identity, emotion, and vulnerability, while the cage represents the constant pressure of society, tradition, and judgment.</p>
@@ -613,17 +641,17 @@
             <section id="section-jenny" class="section">
                 <div class="hy">
                     <div class="artist-signature">
-                        <div class="name">Ջենի Գևորգյան<span class="icon-placeholder"></span></div>
+                        <div class="name">Ջենի Գևորգյան</div>
                         <div class="line"></div>
-                        <div class="artwork">[Անվանում]</div>
+                        <div class="artwork">իրականություն<span class="icon-placeholder"></span></div>
                     </div>
                     <p>Գուցե դանակի տեղը իրականությունն է, որ ստիպում է փակել աչքերդ։</p>
                 </div>
                 <div class="en">
                     <div class="artist-signature">
-                        <div class="name">Jenny Gevorgyan<span class="icon-placeholder"></span></div>
+                        <div class="name">Jenny Gevorgyan</div>
                         <div class="line"></div>
-                        <div class="artwork">[Name]</div>
+                        <div class="artwork">reality<span class="icon-placeholder"></span></div>
                     </div>
                     <p>Maybe instead of a knife, reality is what forces you to close your eyes.</p>
                 </div>
@@ -632,17 +660,17 @@
             <section id="section-yeva" class="section">
                 <div class="hy">
                     <div class="artist-signature">
-                        <div class="name">Եվա Աբգարյան<span class="icon-placeholder"></span></div>
+                        <div class="name">Եվա Աբգարյան</div>
                         <div class="line"></div>
-                        <div class="artwork">Faceless</div>
+                        <div class="artwork">Faceless<span class="icon-placeholder"></span></div>
                     </div>
                     <p>Արվեստի գործն ինքնին խոսում է իր մասին. այն պատկերում է ինձ նման մի աղջկա, որը ձեռքին երկու դիմակ է պահում. մեկը ժպտում է, մյուսը՝ ավելի մեծ ժպտում, կարծես սրանք միակ դեմքերն են, որոնցից նրան թույլատրվում է ընտրել: Դրանց տակ նրա իրական դեմքն է...</p>
                 </div>
                 <div class="en">
                     <div class="artist-signature">
-                        <div class="name">Yeva Abgaryan<span class="icon-placeholder"></span></div>
+                        <div class="name">Yeva Abgaryan</div>
                         <div class="line"></div>
-                        <div class="artwork">Faceless</div>
+                        <div class="artwork">Faceless<span class="icon-placeholder"></span></div>
                     </div>
                     <p>The artwork speaks for itself-it shows a girl, looking like me, holding two masks: one smiling, another smiling even bigger, as if these are the only faces she is allowed to choose from. Beneath them, her real face...</p>
                 </div>
@@ -651,8 +679,9 @@
             <section id="section-emilya" class="section">
                 <div class="hy">
                     <div class="artist-signature">
-                        <div class="name">Էմիլյա Նիկողոսյան<span class="icon-placeholder"></span></div>
+                        <div class="name">Էմիլյա Նիկողոսյան</div>
                         <div class="line"></div>
+                        <div class="artwork">a-1<span class="icon-placeholder"></span></div>
                     </div>
                     <p>Մեր աշխարհի ներսում կան բազմաթիվ այլ աշխարհներ։</p>
                     <p>Հնարավոր է՝ այլևս ասելու ոչինչ չկա—</p>
@@ -660,8 +689,9 @@
                 </div>
                 <div class="en">
                     <div class="artist-signature">
-                        <div class="name">Emilya Nikoghosyan<span class="icon-placeholder"></span></div>
+                        <div class="name">Emilya Nikoghosyan</div>
                         <div class="line"></div>
+                        <div class="artwork">a-1<span class="icon-placeholder"></span></div>
                     </div>
                     <p>Inside our world, there are many other worlds.</p>
                     <p>Maybe nothing more needs to be said—</p>
@@ -677,30 +707,57 @@
                 <div class="support-subtitle">Եթե դուք ենթարկվել եք սեռական բռնության, դուք մենակ չեք։</div>
                 <p class="support-desc">Օգնություն կա։ Լուռ։ Գաղտնի։ Առանց դատապարտելու։</p>
                 
+                <div class="awareness-banner">
+                    <strong>Ապրիլը՝ որպես սեռական բռնության վերաբերյալ իրազեկման և ջատագովության ամիս.</strong> 
+                    <p>Ապրիլ ամիսը կոլեկտիվ մտորումների, գործողությունների և համերաշխության ամրապնդման ամիս է սեռական բռնության վերաբերյալ իրազեկվածությունը բարձրացնելու համար։ Ամսվա ընթացքում ամենատարբեր գործողությունների միջոցով ևս մեկ անգամ ամրապնդվում է սեռական բռնության բոլոր ձևերին վերջ դնելու պատրաստակամությունը։</p>
+                    <p>Ներքևում ներկայացված են ստուգված հայկական հասարակական կազմակերպությունների (ՀԿ) տվյալներ, որոնք տրամադրում են անվճար և գաղտնի հոգեբանական, իրավաբանական և սոցիալական աջակցություն։</p>
+                </div>
+                
                 <div class="support-grid">
                     <div class="support-col">
-                        <h3>Զանգահարեք</h3>
+                        <h3>Թեժ գծեր</h3>
                         <div class="support-table">
                             <div class="fw-bold">102</div>
                             <div>Ոստիկանություն</div>
                             
                             <div class="fw-bold">103</div>
                             <div>Շտապօգնություն</div>
-                            
-                            <div class="fw-bold">+374 93 568 080</div>
+
+                            <div class="fw-bold">093 568 080</div>
                             <div>Կանանց աջակցման կենտրոն (24/7)</div>
                             
-                            <div class="fw-bold">+374 77 991 280</div>
+                            <div class="fw-bold">077 991 280</div>
                             <div>Սեռական բռնության ճգնաժամային կենտրոն</div>
+
+                            <div class="fw-bold">099 88 78 08</div>
+                            <div>Ընտանեկան բռնության թեժ գիծ</div>
+                            
+                            <div class="fw-bold">077 99 12 80</div>
+                            <div>Սեռական բռնության/թրաֆիքինգի թեժ գիծ</div>
+
+                            <div class="fw-bold">077 04 30 42</div>
+                            <div>Հաշմանդամություն ունեցող կանանց նկատմամբ բռնության թեժ գիծ</div>
+
+                            <div class="fw-bold">093 66 33 83</div>
+                            <div>ՄԻԱՎ-ով ապրող անձանց աջակցության թեժ գիծ</div>
+
+                            <div class="fw-bold">093 94 88 86</div>
+                            <div>Անվճար իրավաբանական խորհրդատվություն</div>
+
+                            <div class="fw-bold">094 56 56 26</div>
+                            <div>Կանանց ռեսուրսային կենտրոն (գրասենյակ)</div>
                         </div>
                     </div>
                     <div class="support-col">
-                        <h3>Դիմեք</h3>
+                        <h3>Հղումներ</h3>
                         <div class="support-table">
                             <div class="full-width"><a href="https://saccarmenia.org/en_us/%D5%B4%D5%A5%D6%80-%D5%B4%D5%A1%D5%BD%D5%AB%D5%B6/" target="_blank">Սեռական բռնության ճգնաժամային կենտրոն</a></div>
                             <div class="full-width"><a href="https://womenfundarmenia.org/" target="_blank">Կանանց Հիմնադրամ Հայաստան</a></div>
                             <div class="full-width"><a href="https://womensrightshouse.org/about-us/" target="_blank">Կանանց իրավունքների տուն</a></div>
                             <div class="full-width"><a href="https://womenofarmenia.org/" target="_blank">Կանանց ռեսուրսային կենտրոն</a></div>
+                            <div class="full-width"><a href="https://www.pinkarmenia.org/" target="_blank">Փինք իրավապաշտպան ՀԿ</a></div>
+                            <div class="full-width"><a href="http://coalitionagainstviolence.org/" target="_blank">Ընդդեմ կանանց նկատմամբ բռնության կոալիցիա</a></div>
+                            <div class="full-width"><a href="https://wrcorg.am/" target="_blank">Կանանց իրավունքների կենտրոն</a></div>
                             <div class="fw-bold"><a href="https://safeyou.space/en" target="_blank">Safe YOU</a></div>
                             <div>բջջային աջակցության ցանց</div>
                         </div>
@@ -714,30 +771,57 @@
                 <div class="support-subtitle">If you have experienced sexual violence, you are not alone.</div>
                 <p class="support-desc">Help exists. Quietly. Confidentially. Without judgment.</p>
                 
+                <div class="awareness-banner">
+                    <strong>April as Sexual Assault Awareness and Advocacy Month.</strong> 
+                    <p>April is a month of collective reflection, action, and solidarity building to raise awareness about sexual violence. Throughout the month, various initiatives reaffirm the commitment to ending all forms of sexual violence.</p>
+                    <p>Below is verified information for Armenian Non-Governmental Organizations (NGOs) providing free and confidential psychological, legal, and social support.</p>
+                </div>
+                
                 <div class="support-grid">
                     <div class="support-col">
-                        <h3>Call</h3>
+                        <h3>Hotlines</h3>
                         <div class="support-table">
                             <div class="fw-bold">102</div>
                             <div>Police</div>
                             
                             <div class="fw-bold">103</div>
                             <div>Ambulance</div>
-                            
-                            <div class="fw-bold">+374 93 568 080</div>
+
+                            <div class="fw-bold">093 568 080</div>
                             <div>Women’s Support Center (24/7)</div>
                             
-                            <div class="fw-bold">+374 77 991 280</div>
+                            <div class="fw-bold">077 991 280</div>
                             <div>Sexual Assault Crisis Center</div>
+
+                            <div class="fw-bold">099 88 78 08</div>
+                            <div>Domestic Violence Hotline</div>
+                            
+                            <div class="fw-bold">077 99 12 80</div>
+                            <div>Sexual Violence/Trafficking Hotline</div>
+
+                            <div class="fw-bold">077 04 30 42</div>
+                            <div>Violence Against Women with Disabilities Hotline</div>
+
+                            <div class="fw-bold">093 66 33 83</div>
+                            <div>Support for People Living with HIV Hotline</div>
+
+                            <div class="fw-bold">093 94 88 86</div>
+                            <div>Free Legal Counseling Hotline</div>
+
+                            <div class="fw-bold">094 56 56 26</div>
+                            <div>Women's Resource Center (Office)</div>
                         </div>
                     </div>
                     <div class="support-col">
-                        <h3>Reach</h3>
+                        <h3>Links</h3>
                         <div class="support-table">
                             <div class="full-width"><a href="https://saccarmenia.org/en_us/" target="_blank">Sexual Assault Crisis Center</a></div>
                             <div class="full-width"><a href="https://womenfundarmenia.org/" target="_blank">Women's Fund Armenia</a></div>
                             <div class="full-width"><a href="https://womensrightshouse.org/about-us/" target="_blank">Women's Rights House</a></div>
                             <div class="full-width"><a href="https://womenofarmenia.org/" target="_blank">Women's Resource Center</a></div>
+                            <div class="full-width"><a href="https://www.pinkarmenia.org/en/" target="_blank">Pink Armenia</a></div>
+                            <div class="full-width"><a href="http://coalitionagainstviolence.org/en/" target="_blank">Coalition to Stop Violence against Women</a></div>
+                            <div class="full-width"><a href="https://wrcorg.am/en/" target="_blank">Women's Rights Center</a></div>
                             <div class="fw-bold"><a href="https://safeyou.space/en" target="_blank">Safe YOU</a></div>
                             <div>mobile support network</div>
                         </div>
@@ -749,7 +833,7 @@
     </div>
 
     <!-- 3D Modal Structure -->
-    <div id="stl-modal" class="modal-overlay">
+    <div id="model-modal" class="modal-overlay">
         <div class="modal-content">
             <button class="close-btn" id="close-modal" aria-label="Close modal">&times;</button>
             <div id="modal-loading-text">Loading 3D Model...</div>
@@ -807,25 +891,25 @@
     <!-- Unified Three.js Script -->
     <script type="module">
         import * as THREE from 'three';
-        import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import * as CANNON from 'cannon-es';
 
-        // Base URL for Github models to work in sandbox
-        const baseUrl = 'https://raw.githubusercontent.com/emilyanikoghosyan/azd/42f2d926f553353fe9b3dfdfb81d3c2a40918c69/';
+        // Local relative model path for Live Server
+        const baseUrl = './';
 
         // =======================================================================
         // PART 1: 3D PHYSICS HERO ENTRANCE
         // =======================================================================
         const modelsData = [
-            { id: 'Ani', path: baseUrl + 'models/ani.stl', targetId: 'section-ani' },
-            { id: 'Emilya', path: baseUrl + 'models/emilya.stl', targetId: 'section-emilya' },
-            { id: 'Greta', path: baseUrl + 'models/greta.stl', targetId: 'section-greta' },
-            { id: 'Jenny', path: baseUrl + 'models/jenny.stl', targetId: 'section-jenny' },
-            { id: 'Nush', path: baseUrl + 'models/nush.stl', targetId: 'section-nush' },
-            { id: 'Shahane', path: baseUrl + 'models/shahane.stl', targetId: 'section-shahane' },
-            { id: 'Suzy', path: baseUrl + 'models/suzy.stl', targetId: 'section-suzy' },
-            { id: 'Yeva', path: baseUrl + 'models/yeva.stl', targetId: 'section-yeva' }
+            { id: 'Ani', path: baseUrl + 'models/ani.glb', targetId: 'section-ani' },
+            { id: 'Emilya', path: baseUrl + 'models/emilya.glb', targetId: 'section-emilya' },
+            { id: 'Greta', path: baseUrl + 'models/greta.glb', targetId: 'section-greta' },
+            { id: 'Jenny', path: baseUrl + 'models/jenny.glb', targetId: 'section-jenny' },
+            { id: 'Nush', path: baseUrl + 'models/nush.glb', targetId: 'section-nush' },
+            { id: 'Shahane', path: baseUrl + 'models/shahane.glb', targetId: 'section-shahane' },
+            { id: 'Suzy', path: baseUrl + 'models/suzy.glb', targetId: 'section-suzy' },
+            { id: 'Yeva', path: baseUrl + 'models/yeva.glb', targetId: 'section-yeva' }
         ];
 
         const container = document.getElementById('canvas-container');
@@ -840,7 +924,7 @@
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         container.appendChild(renderer.domElement);
 
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
@@ -889,18 +973,16 @@
         });
 
         const loadingManager = new THREE.LoadingManager();
-        const stlLoader = new STLLoader(loadingManager);
+        const gltfLoader = new GLTFLoader(loadingManager);
         
-        const baseMaterial = new THREE.MeshPhysicalMaterial({
+        const baseMaterial = new THREE.MeshStandardMaterial({
             color: 0xffffff,
             metalness: 0.05,
-            roughness: 0.3,
-            clearcoat: 0.5,
-            clearcoatRoughness: 0.2
+            roughness: 0.3
         });
 
         const interactiveObjects = [];
-        const numCopies = 10; 
+        const numCopies = 5; 
 
         loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
             document.getElementById('progress-text').innerText = Math.round((itemsLoaded / itemsTotal) * 100) + '%';
@@ -913,26 +995,27 @@
         };
 
         modelsData.forEach((data) => {
-            stlLoader.load(data.path, (geometry) => {
-                geometry.computeBoundingBox();
-                geometry.computeBoundingSphere();
-                geometry.center();
+            gltfLoader.load(data.path, (gltf) => {
+                const originalModel = gltf.scene;
+                originalModel.updateMatrixWorld(true);
 
-                const meshSize = geometry.boundingSphere.radius;
-                
+                const box = new THREE.Box3().setFromObject(originalModel);
+                const boundingSphere = box.getBoundingSphere(new THREE.Sphere());
+                const modelRadius = boundingSphere.radius;
+                const center = box.getCenter(new THREE.Vector3());
+                originalModel.position.sub(center);
+
                 // --- INCREASED MODEL SIZE HERE ---
                 const targetSize = 8; // Previously 3. This makes them much larger.
-                const scaleFactor = targetSize / meshSize;
+                const scaleFactor = targetSize / modelRadius;
 
                 for (let i = 0; i < numCopies; i++) {
-                    const material = baseMaterial.clone();
-                    const mesh = new THREE.Mesh(geometry, material);
-                    
-                    // Adjusted scale variance slightly to account for the larger base size
-                    const randomScale = scaleFactor * (0.7 + Math.random() * 0.5); 
-                    mesh.scale.set(randomScale, randomScale, randomScale);
-                    
-                    const radius = targetSize * (randomScale / scaleFactor); 
+                    const modelInstance = originalModel.clone(true);
+
+                    const randomScale = scaleFactor * (0.7 + Math.random() * 0.5);
+                    modelInstance.scale.setScalar(randomScale);
+
+                    const radius = modelRadius * randomScale;
                     const body = new CANNON.Body({
                         mass: 5,
                         shape: new CANNON.Sphere(radius * 0.9),
@@ -941,16 +1024,10 @@
                         angularDamping: 0.1
                     });
 
-                    // Spread them out higher and wider when falling so they don't clip instantly
                     body.position.set((Math.random() - 0.5) * 80, 50 + Math.random() * 150, (Math.random() - 0.5) * 20);
-                    
-                    // Fix initial rotation to upright (-90 degrees on X) instead of random tumbling
                     body.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
-                    
-                    world.addBody(body);
-                    scene.add(mesh);
-                    
-                    mesh.userData = {
+
+                    const modelData = {
                         id: data.id,
                         targetId: data.targetId,
                         body: body,
@@ -958,7 +1035,20 @@
                         hoverColor: new THREE.Color(0xdddddd),
                         isHovered: false
                     };
-                    interactiveObjects.push(mesh);
+
+                    modelInstance.userData = modelData;
+                    modelInstance.traverse((child) => {
+                        if (child.isMesh) {
+                            child.material = baseMaterial.clone();
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                            child.userData = modelData;
+                        }
+                    });
+
+                    world.addBody(body);
+                    scene.add(modelInstance);
+                    interactiveObjects.push(modelInstance);
                 }
             });
         });
@@ -966,6 +1056,14 @@
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         let hoveredObject = null;
+
+        function getInteractiveParent(object) {
+            let current = object;
+            while (current && !interactiveObjects.includes(current)) {
+                current = current.parent;
+            }
+            return current;
+        }
 
         const dragPlane = new THREE.Plane();
         let activeConstraint = null;
@@ -1001,24 +1099,27 @@
             clickStartPosition = { x: clientX, y: clientY };
             updatePointer(clientX, clientY);
             raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(interactiveObjects);
+            const intersects = raycaster.intersectObjects(interactiveObjects, true);
 
             if (intersects.length > 0) {
-                draggedMesh = intersects[0].object;
-                const hitPoint = intersects[0].point;
-                const body = draggedMesh.userData.body;
+                const picked = getInteractiveParent(intersects[0].object);
+                if (picked) {
+                    draggedMesh = picked;
+                    const hitPoint = intersects[0].point;
+                    const body = picked.userData.body;
 
-                dragPlane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()), hitPoint);
-                mouseConstraintBody.position.copy(hitPoint);
+                    dragPlane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()), hitPoint);
+                    mouseConstraintBody.position.copy(hitPoint);
 
-                const localPivot = new CANNON.Vec3();
-                body.pointToLocalFrame(new CANNON.Vec3(hitPoint.x, hitPoint.y, hitPoint.z), localPivot);
-                
-                activeConstraint = new CANNON.PointToPointConstraint(body, localPivot, mouseConstraintBody, new CANNON.Vec3(0,0,0), 1e6);
-                world.addConstraint(activeConstraint);
-                body.wakeUp();
-                
-                container.classList.add('pointer-active');
+                    const localPivot = new CANNON.Vec3();
+                    body.pointToLocalFrame(new CANNON.Vec3(hitPoint.x, hitPoint.y, hitPoint.z), localPivot);
+                    
+                    activeConstraint = new CANNON.PointToPointConstraint(body, localPivot, mouseConstraintBody, new CANNON.Vec3(0,0,0), 1e6);
+                    world.addConstraint(activeConstraint);
+                    body.wakeUp();
+                    
+                    container.classList.add('pointer-active');
+                }
             }
         }
 
@@ -1067,14 +1168,16 @@
 
             if (!activeConstraint) {
                 raycaster.setFromCamera(mouse, camera);
-                const intersects = raycaster.intersectObjects(interactiveObjects);
+                const intersects = raycaster.intersectObjects(interactiveObjects, true);
 
                 if (hoveredObject) hoveredObject.userData.isHovered = false;
 
                 if (intersects.length > 0) {
-                    hoveredObject = intersects[0].object;
-                    hoveredObject.userData.isHovered = true;
-                    container.classList.add('pointer-active');
+                    hoveredObject = getInteractiveParent(intersects[0].object);
+                    if (hoveredObject) {
+                        hoveredObject.userData.isHovered = true;
+                        container.classList.add('pointer-active');
+                    }
                 } else {
                     hoveredObject = null;
                     container.classList.remove('pointer-active');
@@ -1088,13 +1191,17 @@
                 mesh.position.copy(body.position);
                 mesh.quaternion.copy(body.quaternion);
 
-                if (data.isHovered || mesh === draggedMesh) {
-                    mesh.material.color.lerp(data.hoverColor, 0.1);
-                    mesh.material.emissive.lerp(new THREE.Color(0x222222), 0.1);
-                } else {
-                    mesh.material.color.lerp(data.baseColor, 0.1);
-                    mesh.material.emissive.lerp(new THREE.Color(0x000000), 0.1);
-                }
+                mesh.traverse((child) => {
+                    if (!child.isMesh || !child.material) return;
+                    const material = child.material;
+                    if (data.isHovered || mesh === draggedMesh) {
+                        material.color.lerp(data.hoverColor, 0.1);
+                        if (material.emissive) material.emissive.lerp(new THREE.Color(0x222222), 0.1);
+                    } else {
+                        material.color.lerp(data.baseColor, 0.1);
+                        if (material.emissive) material.emissive.lerp(new THREE.Color(0x000000), 0.1);
+                    }
+                });
             });
 
             renderer.render(scene, camera);
@@ -1105,44 +1212,29 @@
         // =======================================================================
         // PART 2: 3D MODAL VIEWER (Inside Exhibition Content)
         // =======================================================================
-        const artistModels = {
-            "Սյուզի Գինոսյան": baseUrl + "models/suzy.stl",
-            "Suzy Ginosyan": baseUrl + "models/suzy.stl",
-            "Անի Խաչատրյան": baseUrl + "models/ani.stl",
-            "Ani Khachatryan": baseUrl + "models/ani.stl",
-            "Նուշ Պետրոսյան": baseUrl + "models/nush.stl",
-            "Nush Petrosyan": baseUrl + "models/nush.stl",
-            "Գրետա Գրիգորյան": baseUrl + "models/greta.stl",
-            "Greta Grigoryan": baseUrl + "models/greta.stl",
-            "Շահանե Հարությունյան": baseUrl + "models/shahane.stl",
-            "Shahane Harutyunyan": baseUrl + "models/shahane.stl",
-            "Ջենի Գևորգյան": baseUrl + "models/jenny.stl",
-            "Jenny Gevorgyan": baseUrl + "models/jenny.stl",
-            "Եվա Աբգարյան": baseUrl + "models/yeva.stl",
-            "Yeva Abgaryan": baseUrl + "models/yeva.stl",
-            "Էմիլյա Նիկողոսյան": baseUrl + "models/emilya.stl",
-            "Emilya Nikoghosyan": baseUrl + "models/emilya.stl"
-        };
 
-        // Attach click listeners to the artist names
-        document.querySelectorAll('.name').forEach(nameEl => {
-            nameEl.title = "Click to view 3D artwork";
-            nameEl.addEventListener('click', () => {
-                const artistName = nameEl.textContent.replace('⟲ 3D', '').trim();
-                const stlPath = artistModels[artistName];
-                if (stlPath) openModal(stlPath);
+        // Attach click listeners to the artwork names
+        document.querySelectorAll('.artwork').forEach(artEl => {
+            artEl.title = "Click to view 3D artwork";
+            artEl.addEventListener('click', () => {
+                const section = artEl.closest('.section');
+                if (section && section.id) {
+                    const modelName = section.id.replace('section-', '');
+                    const modelPath = baseUrl + "models/" + modelName + ".glb";
+                    openModal(modelPath);
+                }
             });
         });
 
         let mScene, mCamera, mRenderer, mControls, mCurrentModel, mReqId;
-        const modal = document.getElementById('stl-modal');
+        const modal = document.getElementById('model-modal');
         const mContainer = document.getElementById('modal-canvas-container');
         const closeBtn = document.getElementById('close-modal');
         const mLoadingText = document.getElementById('modal-loading-text');
 
-        function openModal(stlPath) {
+        function openModal(modelPath) {
             modal.style.display = 'flex';
-            initModal3D(stlPath);
+            initModal3D(modelPath);
         }
 
         function closeModal() {
@@ -1159,7 +1251,7 @@
         closeBtn.addEventListener('click', closeModal);
         modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-        function initModal3D(stlPath) {
+        function initModal3D(modelPath) {
             mContainer.innerHTML = ''; 
             mLoadingText.style.display = 'block';
             mLoadingText.innerText = 'Loading 3D Model...';
@@ -1193,24 +1285,21 @@
             mHemiLight.position.set(0, 20, 0);
             mScene.add(mHemiLight);
 
-            const mLoader = new STLLoader();
+            const mLoader = new GLTFLoader();
             
             try {
                 mLoader.load(
-                    stlPath, 
-                    function (geometry) {
+                    modelPath,
+                    function (gltf) {
                         mLoadingText.style.display = 'none';
-                        geometry.computeVertexNormals();
-
-                        const material = new THREE.MeshStandardMaterial({ 
-                            color: 0xffffff,
-                            roughness: 0.4,
-                            metalness: 0.5,
-                            side: THREE.DoubleSide
+                        const mesh = gltf.scene;
+                        mesh.traverse((child) => {
+                            if (child.isMesh) {
+                                child.castShadow = true;
+                                child.receiveShadow = true;
+                            }
                         });
-                        
-                        const mesh = new THREE.Mesh(geometry, material);
-                        mesh.rotation.x = -Math.PI / 2;
+
                         mesh.updateMatrixWorld();
 
                         let box = new THREE.Box3().setFromObject(mesh);
@@ -1252,7 +1341,7 @@
                     }
                 );
             } catch (err) {
-                mLoadingText.innerText = "Error: Invalid path for STL file.";
+                mLoadingText.innerText = "Error: Invalid path for GLB file.";
             }
 
             window.addEventListener('resize', onModalResize, false);
