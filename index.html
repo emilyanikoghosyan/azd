@@ -263,7 +263,7 @@
     }
     
     .modal-content {
-      background: #fff;
+      background: #111; /* Changed to match dark theme */
       width: 90%;
       max-width: 800px;
       height: 80vh;
@@ -290,12 +290,12 @@
       display: flex; align-items: center; justify-content: center;
       transition: background 0.2s;
     }
-    .close-btn:hover { background: #eee; }
+    .close-btn:hover { background: #fff; }
     
     #canvas-container {
       width: 100%;
       height: 100%;
-      background: #f5f5f5;
+      background: #111111; /* Changed to black/dark background */
     }
     
     #loading-text {
@@ -303,7 +303,7 @@
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       font-weight: 600;
-      color: #555;
+      color: #eeeeee; /* Lightened text for dark background */
       pointer-events: none;
       text-align: center;
     }
@@ -685,30 +685,23 @@
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
     // Data Structure mapping artists to their respective STL files.
-    // FOR PREVIEW ENVIRONMENT: We are using a temporary absolute public URL 
-    // to a sample STL file. This avoids the "blob:" URL errors caused by the preview sandbox.
-    // 
-    // TODO: When you deploy to your own server, replace this 'sampleStl' 
-    // with your actual relative paths (e.g., "models/suzy_bond.stl").
-    const sampleStl = "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/stl/ascii/slotted_disk.stl";
-
     const artistModels = {
-      "Սյուզի Գինոսյան": sampleStl, // Replace with "models/suzy_bond.stl"
-      "Suzy Ginosyan": sampleStl, 
-      "Անի Խաչատրյան": sampleStl, // Replace with "models/ani_body.stl"
-      "Ani Khachatryan": sampleStl,
-      "Նուշ Պետրոսյան": sampleStl, // Replace with "models/nush_voice.stl"
-      "Nush Petrosyan": sampleStl,
-      "Գրետա Գրիգորյան": sampleStl, // Replace with "models/greta_anahit.stl"
-      "Greta Grigoryan": sampleStl,
-      "Շահանե Հարությունյան": sampleStl, // Replace with "models/shahane_misfit.stl"
-      "Shahane Harutyunyan": sampleStl,
-      "Ջենի Գևորգյան": sampleStl, // Replace with "models/jenny_permission.stl"
-      "Jenny Gevorgyan": sampleStl,
-      "Եվա Աբգարյան": sampleStl, // Replace with "models/yeva_faceless.stl"
-      "Yeva Abgaryan": sampleStl,
-      "Էմիլյա Նիկողոսյան": sampleStl, // Replace with "models/emilya.stl"
-      "Emilya Nikoghosyan": sampleStl
+      "Սյուզի Գինոսյան": "models/suzy.stl",
+      "Suzy Ginosyan": "models/suzy.stl",
+      "Անի Խաչատրյան": "models/ani.stl",
+      "Ani Khachatryan": "models/ani.stl",
+      "Նուշ Պետրոսյան": "models/nush.stl",
+      "Nush Petrosyan": "models/nush.stl",
+      "Գրետա Գրիգորյան": "models/greta.stl",
+      "Greta Grigoryan": "models/greta.stl",
+      "Շահանե Հարությունյան": "models/shahane.stl",
+      "Shahane Harutyunyan": "models/shahane.stl",
+      "Ջենի Գևորգյան": "models/jenny.stl",
+      "Jenny Gevorgyan": "models/jenny.stl",
+      "Եվա Աբգարյան": "models/yeva.stl",
+      "Yeva Abgaryan": "models/yeva.stl",
+      "Էմիլյա Նիկողոսյան": "models/emilya.stl",
+      "Emilya Nikoghosyan": "models/emilya.stl"
     };
 
     // 1. Attach click listeners to artist names dynamically
@@ -766,11 +759,11 @@
 
       // Setup Scene
       scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xf5f5f5); // Matches site aesthetic
+      scene.background = new THREE.Color(0x111111); // Dark background
 
       // Setup Camera
       camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-      camera.position.set(0, 0, 100);
+      // Camera position will be set dynamically after model loads
 
       // Setup Renderer
       renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -783,17 +776,25 @@
       controls.enableDamping = true; // Smooth drag feeling
       controls.dampingFactor = 0.05;
 
-      // Setup Lighting (Crucial for 3D visibility)
-      const ambientLight = new THREE.AmbientLight(0x404040, 2);
+      // 3. LIGHTING: Enhanced for a metallic look on a dark background
+      // Base lighting lowered so reflections pop
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); 
       scene.add(ambientLight);
       
-      const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.5);
-      dirLight1.position.set(1, 1, 1).normalize();
-      scene.add(dirLight1);
+      // Main strong key light from the top front
+      const mainLight = new THREE.DirectionalLight(0xffffff, 2.5);
+      mainLight.position.set(20, 20, 20); 
+      scene.add(mainLight);
 
-      const dirLight2 = new THREE.DirectionalLight(0xaaaaaa, 1.5);
-      dirLight2.position.set(-1, -1, -1).normalize();
-      scene.add(dirLight2);
+      // Fill light from the opposite side to eliminate harsh dark shadows
+      const fillLight = new THREE.DirectionalLight(0xffffff, 1.0);
+      fillLight.position.set(-20, 0, -20);
+      scene.add(fillLight);
+
+      // Environmental hemisphere light for natural gradients
+      const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
+      hemiLight.position.set(0, 20, 0);
+      scene.add(hemiLight);
 
       // Setup STLLoader
       const loader = new STLLoader();
@@ -804,35 +805,58 @@
           function (geometry) {
             loadingText.style.display = 'none';
 
-            // Minimalist standard material
+            // Compute vertex normals to ensure light reflects correctly off the geometry
+            geometry.computeVertexNormals();
+
+            // 4. MATERIAL: Bright white metallic material
             const material = new THREE.MeshStandardMaterial({ 
-              color: 0x909090, 
-              roughness: 0.4, 
-              metalness: 0.2 
+              color: 0xffffff,   // Pure white
+              roughness: 0.4,    // Lowered for a more polished/metallic surface
+              metalness: 0.5,    // Increased for a metallic sheen
+              side: THREE.DoubleSide // Important: renders both sides if 3D normals are flipped
             });
             
-            currentModel = new THREE.Mesh(geometry, material);
+            const mesh = new THREE.Mesh(geometry, material);
 
-            // Calculate bounding box and center the model mathematically
-            geometry.computeBoundingBox();
-            const boundingBox = geometry.boundingBox;
-            const center = new THREE.Vector3();
-            boundingBox.getCenter(center);
-            currentModel.position.sub(center);
+            // FIX: ROTATION
+            // Standard STL exports usually have Z pointing up. We rotate it -90 degrees on X to stand upright in Three.js (Y-up).
+            mesh.rotation.x = -Math.PI / 2;
+            mesh.updateMatrixWorld();
 
-            // Calculate scale so any sized STL fits nicely on screen
-            const size = new THREE.Vector3();
-            boundingBox.getSize(size);
+            // 1. CENTERING & SCALING:
+            // Calculate bounding box AFTER rotating it upright
+            let box = new THREE.Box3().setFromObject(mesh);
+            let size = box.getSize(new THREE.Vector3());
+            
             const maxDim = Math.max(size.x, size.y, size.z);
             const targetSize = 50; 
             const scale = targetSize / maxDim;
-            currentModel.scale.set(scale, scale, scale);
+            mesh.scale.setScalar(scale);
 
-            // Add to a pivot group to ensure it rotates on its axis properly
+            // Update mesh matrix so the Box3 calculation uses the newly applied scale
+            mesh.updateMatrixWorld();
+
+            // Recalculate bounding box AFTER scaling to get the accurate scaled center
+            box.setFromObject(mesh);
+            const center = box.getCenter(new THREE.Vector3());
+            
+            // Reposition mesh perfectly to the center
+            mesh.position.sub(center);
+
+            // Add to a pivot group. The mesh is off-center locally, but centered visually.
+            // Rotating the pivot rotates the perfectly centered mesh.
             const pivot = new THREE.Group();
             scene.add(pivot);
-            pivot.add(currentModel);
+            pivot.add(mesh);
             currentModel = pivot; 
+
+            // 2. CAMERA: Position based on the bounded target size so the whole model fits
+            const fov = camera.fov * (Math.PI / 180);
+            const cameraDistance = targetSize / (2 * Math.tan(fov / 2)) * 1.5; // 1.5 multiplier adds padding around model
+            
+            camera.position.set(0, 0, cameraDistance);
+            camera.lookAt(0, 0, 0);
+            controls.update();
 
             animate(); // Start render loop
           },
