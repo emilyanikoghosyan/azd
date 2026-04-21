@@ -1087,7 +1087,7 @@
         const gltfLoader = new GLTFLoader(loadingManager);
 
         const interactiveObjects = [];
-        const numCopies = 5; // <-- Փոխեք այս թիվը մոդելների քանակը կարգավորելու համար
+        const numCopies = 3; // <-- Փոխեք այս թիվը մոդելների քանակը կարգավորելու համար
 
         let firstModelLoaded = false;
 
@@ -1129,7 +1129,7 @@
                 originalModel.position.sub(center);
 
                 // Increased base target size for bigger models
-                const targetSize = 14; 
+                const targetSize = 8; 
                 const scaleFactor = targetSize / (modelRadius || 1);
 
                 for (let i = 0; i < numCopies; i++) {
