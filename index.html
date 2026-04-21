@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="hy">
 <head>
     <meta charset="UTF-8" />
@@ -14,6 +14,10 @@
     <!-- Import Maps Polyfill -->
     <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
     
+    <!-- Leaflet CSS & JS for Interactive Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
     <!-- Three.js & Cannon.js Configuration -->
     <script type="importmap">
         {
@@ -124,14 +128,14 @@
         }
 
         #loading-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            position: absolute; /* Changed from fixed */
+            top: 0; left: 0; width: 100%; height: 100%;
             background-color: #0d0d0d;
             color: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
+            z-index: 5; /* Lower than UI layer to allow interaction */
             transition: opacity 1s ease;
         }
 
@@ -146,7 +150,6 @@
             width: 100%;
             height: 100%;
             cursor: grab;
-            touch-action: none;
         }
         
         #canvas-container:active { cursor: grabbing; }
@@ -286,6 +289,41 @@
         .artist-signature .location:hover {
             color: #111;
             text-decoration: underline;
+        }
+
+        /* Map Section */
+        .map-section {
+            margin-top: 60px;
+            margin-bottom: 60px;
+            border-top: 1px solid #eee;
+        }
+
+        #exhibition-map {
+            width: 100%;
+            height: 650px;
+            border-radius: 16px;
+            z-index: 1; /* Keep below modal */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .custom-map-marker {
+            background-color: transparent;
+            border: none;
+        }
+
+        .custom-map-marker div {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .custom-map-marker:hover div {
+            transform: scale(1.2);
+            box-shadow: 0 4px 12px rgba(255, 59, 48, 0.6) !important;
+        }
+
+        /* Leaflet popup customization */
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px;
+            padding: 4px;
         }
 
         /* Icon styling */
@@ -457,19 +495,18 @@
 </head>
 <body class="lang-hy">
 
-    <!-- Loading Screen for 3D Hero -->
-    <div id="loading-screen">
-        <div class="loader">
-            INITIALIZING SPACE... <br><br>
-            <span id="progress-text">0%</span>
-        </div>
-    </div>
-
     <!-- ==========================================
          HERO SECTION (3D Physics Canvas)
     =========================================== -->
     <section id="hero-section">
-        <!-- Text overlay removed to focus entirely on the chaotic 3D models -->
+        <!-- Loading Screen moved inside hero section -->
+        <div id="loading-screen">
+            <div class="loader">
+                INITIALIZING SPACE... <br><br>
+                <span id="progress-text">0%</span>
+            </div>
+        </div>
+
         <div id="ui-layer">
             <div class="scroll-indicator">
                 <span class="hy">scroll down ↓</span>
@@ -514,9 +551,6 @@
                 </div>
             </section>
 
-            <!-- 
-                Reusable Element for the 3D Icon (Red dot)
-            -->
             <template id="icon-3d-template">
                 <span class="icon-3d"></span>
             </template>
@@ -527,7 +561,6 @@
                         <div class="name">Սյուզի Գինոսյան</div>
                         <div class="line"></div>
                         <div class="artwork">կապ<span class="icon-placeholder"></span></div>
-                        <a href="https://www.google.com/maps/place/Central+Park/@40.7850871,43.8328931,17z/data=!3m1!4b1!4m6!3m5!1s0x4041fc754e297085:0x9e8d0bd8b05d3d5d!8m2!3d40.7850871!4d43.835468!16s%2Fg%2F1td0d_2j?entry=ttu&g_ep=EgoyMDI2MDMyNC4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="location">📍 location</a>
                     </div>
                     <p>Անհատը ինքնաբավ չէ․ այն մշտապես ձևավորվում է արտաքին հայացքների և միջամտությունների ներսում։ «Ես»-ը կայուն չէ, այլ դաշտ է, որի վրա միաժամանակ ներգործում են տարբեր կամքեր՝ փորձելով այն ձևավորել իրենց պատկերացմամբ։</p>
                     <p>Թելը այստեղ դառնում է կապի և սահմանի միաժամանակյա նշան․ այն միավորում է, բայց նաև սահմանափակում։ Խնամքի, վերահսկման և պատկանելիության միջև սահմանը խամրում է, իսկ բազմակի ուղղորդումները վերածվում են խճճվածության։</p>
@@ -539,7 +572,6 @@
                         <div class="name">Suzy Ginosyan</div>
                         <div class="line"></div>
                         <div class="artwork">bond<span class="icon-placeholder"></span></div>
-                        <a href="https://www.google.com/maps/place/Central+Park/@40.7850871,43.8328931,17z/data=!3m1!4b1!4m6!3m5!1s0x4041fc754e297085:0x9e8d0bd8b05d3d5d!8m2!3d40.7850871!4d43.835468!16s%2Fg%2F1td0d_2j?entry=ttu&g_ep=EgoyMDI2MDMyNC4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="location">📍 location</a>
                     </div>
                     <p>The individual is not self-contained, but continuously shaped through external gazes and interventions. The “self” emerges not as a stable entity, but as a field where multiple wills act simultaneously, attempting to define it.</p>
                     <p>The thread functions as both connection and boundary—binding while constraining. It reveals the blurred threshold between care, control, and belonging, as multiple directions accumulate into entanglement.</p>
@@ -599,11 +631,9 @@
                         <div class="line"></div>
                         <div class="artwork">Անահիտ<span class="icon-placeholder"></span></div>
                     </div>
-                    <p>Այս նախագիծը ուսումնասիրում է տարբեր լինելու հուզական ծանրությունը փոքր քաղաքում, որտեղ անհատականությունը հաճախ դառնում է մեկուսացման պատճառ, ոչ թե ազատության։</p>
-                    <p>Կերպարը ներկայացնում է մի մարդու, ով հրաժարվում է կորցնել իր ինքնությունը՝ նույնիսկ մշտական հասարակական ճնշման պայմաններում։</p>
+                    <p>Այս նախագիծը ուսումնասիրում է տարբեր լինելու հուզական ծանրությունը փոքր քաղաքում, որտեղ անհատականությունը հաճախ դառնում է մեկուսացման պատճառ, ոչ թե ազատության։ Կերպարը ներկայացնում է մի մարդու, ով հրաժարվում է կորցնել իր ինքնությունը՝ նույնիսկ մշտական հասարակական ճնշման պայմաններում։</p>
                     <p>Այնպիսի վայրում, որտեղ բոլորը ճանաչում են միմյանց, առանձնանալը քեզ դարձնում է օտար, գրեթե՝ այլմոլորակային։ Անծանոթը դառնում է անհարմար մյուսների համար, և այդ անհարմարությունը վերածվում է շշուկների, դատողությունների և քո մասին տարածվող բամբասանքների։</p>
-                    <p>Այս բոլոր խոսքերն ու կարծիքները սկսում են ծանրանալ, կարծես մի բան սեղմում է կոկորդդ։ Դառնում է դժվար ապրել ազատ ու պարզապես լինել այն, ինչ դու ես։</p>
-                    <p>Նախագիծը ցույց է տալիս ընդունված լինելու և յուրահատուկ մնալու միջև պայքարը։ Այն ընդգծում է, թե որքան դժվար, բայց միևնույն ժամանակ կարևոր է մնալ ինքդ քեզ՝ անկախ նրանից, թե ինչ են ասում մյուսները։</p>
+                    <p>Այս բոլոր խոսքերն ու կարծիքները սկսում են ծանրանալ, կարծես մի բան սեղմում է կոկորդդ։ Դառնում է դժվար ապրել ազատ ու պարզապես լինել այն, ինչ դու ես։ Նախագիծը ցույց է տալիս ընդունված լինելու և յուրահատուկ մնալու միջև պայքարը։ Այն ընդգծում է, թե որքան դժվար, բայց միևնույն ժամանակ կարևոր է մնալ ինքդ քեզ՝ անկախ նրանից, թե ինչ են ասում մյուսները։</p>
                 </div>
                 <div class="en">
                     <div class="artist-signature">
@@ -698,6 +728,16 @@
                     <p>except that sometimes, they reflect back.</p>
                 </div>
             </section>
+
+            <!-- Airbnb-style Interactive Map Section -->
+            <section id="map-section" class="section map-section">
+                <p style="text-align: center; margin-bottom: 40px; font-size: 18px; font-weight: 500; color: #111; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+                    <span class="hy">Որոշ աշխատանքներ գողացվել են, թաքցվել կամ ոչնչացվել, սրանք այն վայրերն են, որոնք մենք ընտրել ենք կարևոր դարձնել Գյումրիի համար։</span>
+                    <span class="en">Some artworks have been stolen, hidden, or destroyed; these are the locations we have chosen to make meaningful for Gyumri.</span>
+                </p>
+                <div id="exhibition-map"></div>
+            </section>
+
         </main>
 
         <footer class="support-section">
@@ -756,8 +796,6 @@
                             <div class="full-width"><a href="https://womensrightshouse.org/about-us/" target="_blank">Կանանց իրավունքների տուն</a></div>
                             <div class="full-width"><a href="https://womenofarmenia.org/" target="_blank">Կանանց ռեսուրսային կենտրոն</a></div>
                             <div class="full-width"><a href="https://www.pinkarmenia.org/" target="_blank">Փինք իրավապաշտպան ՀԿ</a></div>
-                            <div class="full-width"><a href="http://coalitionagainstviolence.org/" target="_blank">Ընդդեմ կանանց նկատմամբ բռնության կոալիցիա</a></div>
-                            <div class="full-width"><a href="https://wrcorg.am/" target="_blank">Կանանց իրավունքների կենտրոն</a></div>
                             <div class="fw-bold"><a href="https://safeyou.space/en" target="_blank">Safe YOU</a></div>
                             <div>բջջային աջակցության ցանց</div>
                         </div>
@@ -820,8 +858,6 @@
                             <div class="full-width"><a href="https://womensrightshouse.org/about-us/" target="_blank">Women's Rights House</a></div>
                             <div class="full-width"><a href="https://womenofarmenia.org/" target="_blank">Women's Resource Center</a></div>
                             <div class="full-width"><a href="https://www.pinkarmenia.org/en/" target="_blank">Pink Armenia</a></div>
-                            <div class="full-width"><a href="http://coalitionagainstviolence.org/en/" target="_blank">Coalition to Stop Violence against Women</a></div>
-                            <div class="full-width"><a href="https://wrcorg.am/en/" target="_blank">Women's Rights Center</a></div>
                             <div class="fw-bold"><a href="https://safeyou.space/en" target="_blank">Safe YOU</a></div>
                             <div>mobile support network</div>
                         </div>
@@ -885,21 +921,78 @@
 
             // Start observing
             revealElements.forEach(el => observer.observe(el));
+
+            // Initialize Leaflet Map
+            initMap();
         });
+
+        function initMap() {
+            // Center of Gyumri
+            const map = L.map('exhibition-map', {
+                scrollWheelZoom: false // prevents accidental zooming when scrolling down the page
+            }).setView([40.7875, 43.8415], 16);
+
+            // Use CartoDB Positron for a clean, minimal "Airbnb" look
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+
+            // Approximate coordinates in Gyumri (Update these if you have the exact lat/lng)
+            const mapLocations = [
+                { nameHy: "Սյուզի Գինոսյան", nameEn: "Suzy Ginosyan", art: "կապ / bond", lat: 40.7850871, lng: 43.835468, link: "https://maps.app.goo.gl/pk4ohH6kAd17BWrh6" },
+                { nameHy: "Անի Խաչատրյան", nameEn: "Ani Khachatryan", art: "մարմին / Body", lat: 40.7880, lng: 43.8380, link: "https://maps.app.goo.gl/SRb3DKRZ7HbSGMX99" },
+                { nameHy: "Նուշ Պետրոսյան", nameEn: "Nush Petrosyan", art: "Ձայն / Voice", lat: 40.7895, lng: 43.8420, link: "https://maps.app.goo.gl/7RB8VmfpCHqHs9Qo9?g_st=atm" },
+                { nameHy: "Գրետա Գրիգորյան", nameEn: "Greta Grigoryan", art: "Անահիտ / Anahit", lat: 40.7865, lng: 43.8450, link: "https://maps.app.goo.gl/H6rUEP4zhPpLs8Fr7?g_st=atm" },
+                { nameHy: "Շահանե Հարությունյան", nameEn: "Shahane Harutyunyan", art: "միսֆիթ / Misfit", lat: 40.7840, lng: 43.8390, link: "https://maps.app.goo.gl/HVEYyPaojQNeCf8i6?g_st=atm" },
+                { nameHy: "Ջենի Գևորգյան", nameEn: "Jenny Gevorgyan", art: "իրականություն / reality", lat: 40.7905, lng: 43.8365, link: "https://maps.app.goo.gl/hFBfXTgr1uk11SF6A" },
+                { nameHy: "Եվա Աբգարյան", nameEn: "Yeva Abgaryan", art: "Faceless", lat: 40.7860, lng: 43.8480, link: "https://maps.app.goo.gl/LrT82noPqm6wVQiB8" },
+                { nameHy: "Էմիլյա Նիկողոսյան", nameEn: "Emilya Nikoghosyan", art: "a-1", lat: 40.7910, lng: 43.8410, link: "https://maps.app.goo.gl/eZxz7i4mPEFr8Jzz6" }
+            ];
+
+            mapLocations.forEach(loc => {
+                // Custom Red Dot Marker
+                const markerIcon = L.divIcon({
+                    className: 'custom-map-marker',
+                    html: `<div style="background-color: #ff3b30; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); display:flex; justify-content:center; align-items:center;"><span style="background:#fff; width:6px; height:6px; border-radius:50%;"></span></div>`,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12],
+                    popupAnchor: [0, -12]
+                });
+
+                const marker = L.marker([loc.lat, loc.lng], {icon: markerIcon}).addTo(map);
+
+                const popupContent = `
+                    <div style="font-family: 'Montserrat', sans-serif; text-align: center; padding: 4px; min-width: 140px;">
+                        <strong style="font-size: 14px; color: #111;">
+                            <span class="hy">${loc.nameHy}</span>
+                            <span class="en">${loc.nameEn}</span>
+                        </strong><br>
+                        <span style="color: #666; font-size: 12px; margin-bottom: 12px; display: block; font-weight: 500;">${loc.art}</span>
+                        <a href="${loc.link}" target="_blank" style="display: inline-block; background: #111; color: #fff; text-decoration: none; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; width: 100%; box-sizing: border-box; transition: background 0.2s;">
+                            <span class="hy">open</span>
+                            <span class="en">open</span>
+                        </a>
+                    </div>
+                `;
+                marker.bindPopup(popupContent);
+            });
+        }
     </script>
 
-    <!-- Unified Three.js Script -->
+    <!-- Unified Three.js Script using actual models -->
     <script type="module">
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import * as CANNON from 'cannon-es';
 
-        // Local relative model path for Live Server
-        const baseUrl = './';
+        // Local relative model path replaced with RAW github URL so it fetches properly inside this iframe
+        const baseUrl = 'https://raw.githubusercontent.com/emilyanikoghosyan/azd/885ceb4be524172b65101171d35a3521279bab88/';
 
         // =======================================================================
-        // PART 1: 3D PHYSICS HERO ENTRANCE
+        // PART 1: 3D PHYSICS HERO ENTRANCE (ACTUAL MODELS)
         // =======================================================================
         const modelsData = [
             { id: 'Ani', path: baseUrl + 'models/ani.glb', targetId: 'section-ani' },
@@ -919,7 +1012,6 @@
 
         const isMobile = window.innerWidth < 768;
         const camera = new THREE.PerspectiveCamera(isMobile ? 60 : 45, window.innerWidth / window.innerHeight, 0.1, 500);
-        // Pulled camera back slightly to accommodate larger models
         camera.position.set(0, isMobile ? 20 : 10, isMobile ? 120 : 100);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -958,7 +1050,7 @@
         world.addBody(floorBody);
 
         const wallShape = new CANNON.Plane();
-        const sideWallDist = isMobile ? 22 : 45; // widened the walls a bit for larger models
+        const sideWallDist = isMobile ? 22 : 45;
         const wallOffsets = [
             { pos: [0, 0, -20], rot: [0, 0, 0] },
             { pos: [0, 0, 30], rot: [0, Math.PI, 0] },
@@ -972,26 +1064,45 @@
             world.addBody(wallBody);
         });
 
-        const loadingManager = new THREE.LoadingManager();
-        const gltfLoader = new GLTFLoader(loadingManager);
-        
-        const baseMaterial = new THREE.MeshStandardMaterial({
+        // Enhancing metallic effect for the hero section
+        const baseColorMat = new THREE.MeshStandardMaterial({
             color: 0xffffff,
-            metalness: 0.05,
-            roughness: 0.3
+            metalness: 0.8,
+            roughness: 0.2
         });
 
+        const loadingManager = new THREE.LoadingManager();
+        const gltfLoader = new GLTFLoader(loadingManager);
+
         const interactiveObjects = [];
-        const numCopies = 5; 
+        const numCopies = 5; // <-- Փոխեք այս թիվը մոդելների քանակը կարգավորելու համար
+
+        let firstModelLoaded = false;
 
         loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
-            document.getElementById('progress-text').innerText = Math.round((itemsLoaded / itemsTotal) * 100) + '%';
+            const progressText = document.getElementById('progress-text');
+            if (progressText) {
+                progressText.innerText = Math.round((itemsLoaded / itemsTotal) * 100) + '%';
+            }
+            
+            // Progressive loading: hide screen as soon as the first model is ready
+            if (itemsLoaded >= 1 && !firstModelLoaded) {
+                firstModelLoaded = true;
+                const loadingScreen = document.getElementById('loading-screen');
+                if (loadingScreen) {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(() => loadingScreen.remove(), 1000);
+                }
+            }
         };
 
         loadingManager.onLoad = () => {
+            // Fallback in case onProgress doesn't trigger hide properly
             const loadingScreen = document.getElementById('loading-screen');
-            loadingScreen.style.opacity = '0';
-            setTimeout(() => loadingScreen.remove(), 1000);
+            if (loadingScreen) {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => loadingScreen.remove(), 1000);
+            }
         };
 
         modelsData.forEach((data) => {
@@ -1005,9 +1116,8 @@
                 const center = box.getCenter(new THREE.Vector3());
                 originalModel.position.sub(center);
 
-                // --- INCREASED MODEL SIZE HERE ---
-                const targetSize = 8; // Previously 3. This makes them much larger.
-                const scaleFactor = targetSize / modelRadius;
+                const targetSize = 8;
+                const scaleFactor = targetSize / (modelRadius || 1);
 
                 for (let i = 0; i < numCopies; i++) {
                     const modelInstance = originalModel.clone(true);
@@ -1039,7 +1149,7 @@
                     modelInstance.userData = modelData;
                     modelInstance.traverse((child) => {
                         if (child.isMesh) {
-                            child.material = baseMaterial.clone();
+                            child.material = baseColorMat.clone();
                             child.castShadow = true;
                             child.receiveShadow = true;
                             child.userData = modelData;
@@ -1091,7 +1201,9 @@
 
         container.addEventListener('mousemove', (e) => onPointerMove(e.clientX, e.clientY));
         container.addEventListener('touchmove', (e) => {
-            e.preventDefault();
+            if (activeConstraint) {
+                e.preventDefault(); // Only prevent scroll if dragging an object
+            }
             onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
         }, { passive: false });
 
@@ -1210,10 +1322,9 @@
 
 
         // =======================================================================
-        // PART 2: 3D MODAL VIEWER (Inside Exhibition Content)
+        // PART 2: 3D MODAL VIEWER (Inside Exhibition Content - ACTUAL MODELS)
         // =======================================================================
 
-        // Attach click listeners to the artwork names
         document.querySelectorAll('.artwork').forEach(artEl => {
             artEl.title = "Click to view 3D artwork";
             artEl.addEventListener('click', () => {
@@ -1270,20 +1381,25 @@
             mControls.enableDamping = true; 
             mControls.dampingFactor = 0.05;
 
-            const mAmbient = new THREE.AmbientLight(0xffffff, 0.6); 
+            // Enhancing lighting for the modal view
+            const mAmbient = new THREE.AmbientLight(0xffffff, 1.2); 
             mScene.add(mAmbient);
             
-            const mMainLight = new THREE.DirectionalLight(0xffffff, 2.5);
+            const mMainLight = new THREE.DirectionalLight(0xffffff, 4.0);
             mMainLight.position.set(20, 20, 20); 
             mScene.add(mMainLight);
 
-            const mFillLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            const mFillLight = new THREE.DirectionalLight(0xffffff, 2.0);
             mFillLight.position.set(-20, 0, -20);
             mScene.add(mFillLight);
 
-            const mHemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
+            const mHemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.5);
             mHemiLight.position.set(0, 20, 0);
             mScene.add(mHemiLight);
+
+            const mPointLight = new THREE.PointLight(0xffffff, 3.0);
+            mPointLight.position.set(0, 10, 10);
+            mScene.add(mPointLight);
 
             const mLoader = new GLTFLoader();
             
@@ -1297,6 +1413,12 @@
                             if (child.isMesh) {
                                 child.castShadow = true;
                                 child.receiveShadow = true;
+                                // Add metallic effect to modal viewer models
+                                if (child.material) {
+                                    child.material.metalness = 0.8;
+                                    child.material.roughness = 0.2;
+                                    child.material.needsUpdate = true;
+                                }
                             }
                         });
 
@@ -1307,7 +1429,7 @@
                         
                         const maxDim = Math.max(size.x, size.y, size.z);
                         const targetSize = 50; 
-                        const scale = targetSize / maxDim;
+                        const scale = targetSize / (maxDim || 1);
                         mesh.scale.setScalar(scale);
 
                         mesh.updateMatrixWorld();
