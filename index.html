@@ -300,7 +300,7 @@
 
         #exhibition-map {
             width: 100%;
-            height: 650px;
+            height: 400px; /* Reduced height for mobile to allow scrolling past it */
             border-radius: 16px;
             z-index: 1; /* Keep below modal */
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
@@ -478,6 +478,10 @@
             .artist-signature .location { font-size: 14px; }
             .support-grid { grid-template-columns: 1fr 1fr; gap: 60px; }
             .support-section { padding: 50px; }
+            
+            #exhibition-map {
+                height: 650px; /* Keep large height on desktop */
+            }
         }
 
         /* Scroll Reveal Animation Styles */
@@ -1019,18 +1023,26 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         container.appendChild(renderer.domElement);
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        // Increased ambient light for better overall visibility
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
         scene.add(ambientLight);
 
-        const spotLight = new THREE.SpotLight(0xffffff, 250);
+        // Increased spotlight intensity
+        const spotLight = new THREE.SpotLight(0xffffff, 400);
         spotLight.position.set(20, 50, 30);
         spotLight.angle = Math.PI / 3;
         spotLight.penumbra = 0.8;
         scene.add(spotLight);
 
-        const fillLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        // Increased directional light
+        const fillLight = new THREE.DirectionalLight(0xffffff, 3.0);
         fillLight.position.set(-20, 10, 20);
         scene.add(fillLight);
+
+        // Added hemisphere light for softer shadows and detail highlighting
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
+        hemiLight.position.set(0, 20, 0);
+        scene.add(hemiLight);
 
         const world = new CANNON.World();
         world.gravity.set(0, -40, 0);
@@ -1064,11 +1076,11 @@
             world.addBody(wallBody);
         });
 
-        // Enhancing metallic effect for the hero section
+        // Less metallic, smoother material to show details
         const baseColorMat = new THREE.MeshStandardMaterial({
             color: 0xffffff,
-            metalness: 0.8,
-            roughness: 0.2
+            metalness: 0.3,
+            roughness: 0.6
         });
 
         const loadingManager = new THREE.LoadingManager();
@@ -1116,7 +1128,8 @@
                 const center = box.getCenter(new THREE.Vector3());
                 originalModel.position.sub(center);
 
-                const targetSize = 8;
+                // Increased base target size for bigger models
+                const targetSize = 14; 
                 const scaleFactor = targetSize / (modelRadius || 1);
 
                 for (let i = 0; i < numCopies; i++) {
